@@ -16,6 +16,8 @@ src/meari/mqtt.js   minimal MQTT 3.1.1 subscriber over TLS (no dependency)
 src/meari/events.js alarm payload parsing (motion / doorbell / other)
 src/meari/crypto.js request signing, password/account encryption, .jpgx3 snapshot decoding
 src/image.js        fits snapshots into the 150 KB Gladys image budget (jpeg-js)
+src/history.js      doorbell press history, persisted in /data
+src/widgets.js      dashboard widgets: camera_view, doorbell_history
 scripts/probe.js    standalone probe: login, list cameras, print raw alarm types
 ```
 
@@ -32,7 +34,7 @@ MEARI_EMAIL=you@example.com MEARI_PASSWORD='...' node scripts/probe.js
 GLADYS_HOST_API_URL="http://localhost:1443" \
 GLADYS_INTEGRATION_TOKEN="<token>" \
 GLADYS_INTEGRATION_SELECTOR="<selector>" \
-LOG_LEVEL=debug npm start
+DATA_DIR=./data LOG_LEVEL=debug npm start   # DATA_DIR: /data in the container
 ```
 
 ## Credits

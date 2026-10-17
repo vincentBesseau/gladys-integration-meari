@@ -9,6 +9,7 @@
 
 import { GladysIntegration, logger } from '@gladysassistant/integration-sdk';
 import { Runtime } from './src/runtime.js';
+import { registerWidgets } from './src/widgets.js';
 
 const gladys = new GladysIntegration();
 const runtime = new Runtime(gladys);
@@ -28,6 +29,9 @@ gladys.onPoll(async (device) => {
 });
 
 gladys.onAction('test_connection', () => runtime.testConnection());
+
+// Dashboard widgets: content, button actions, images by key.
+registerWidgets(gladys, runtime);
 
 gladys.onConfigUpdated(async (config) => {
   logger.info('Configuration updated');

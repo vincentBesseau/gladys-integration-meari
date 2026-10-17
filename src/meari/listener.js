@@ -245,7 +245,9 @@ export class AlarmListener {
     const last = this.lastDispatch.get(mergeKey);
     const now = this.now();
     const repeat = last !== undefined && now - last < MERGE_WINDOW_MS;
-    if (repeat && event.kind === 'doorbell') {
+    // A second copy of a press only matters for its picture: the push often
+    // comes without one, the event log a few seconds later with it.
+    if (repeat && event.kind === 'doorbell' && !event.imageUrl) {
       logger.debug(`Duplicate doorbell press merged (${source})`);
       return false;
     }

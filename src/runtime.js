@@ -17,9 +17,13 @@ import {
   switchStates,
   IOT_SWITCHES,
 } from './camera.js';
+import { DoorbellHistory, parseEventTime } from './history.js';
 import { fitJpeg } from './image.js';
 import { MeariAuthError, MeariClient } from './meari/client.js';
+import { decodeEventSnapshot } from './meari/crypto.js';
+import { classifyAlarm, eventLogId, findImageUrl } from './meari/events.js';
 import { AlarmListener } from './meari/listener.js';
+import { HISTORY_SIZE, WIDGET_KEYS } from './widgets.js';
 
 const logger = createLogger({ name: 'runtime' });
 
@@ -29,6 +33,17 @@ export const DOORBELL_RESET_MS = 5_000;
 const IMAGE_MIN_INTERVAL_MS = 5_000;
 // Gladys polls each device every minute; tolerate the tick drift.
 const POLL_TOLERANCE_MS = 30_000;
+// How far back the cloud event log is read to rebuild the doorbell history.
+const HISTORY_SEED_DAYS = 7;
+// An event time read from the cloud further than this from "now" is a clock
+// mismatch, not the time of a live alarm.
+const LIVE_EVENT_SKEW_MS = 10 * 60_000;
+
+function dayString(t) {
+  const d = new Date(t);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+}
 
 const NOT_CONFIGURED = {
   en: 'Enter the e-mail and password of your ieGeek Cam account.',
@@ -49,6 +64,7 @@ export class Runtime {
    * @param {object} [deps] injected in tests
    * @param {(config: object) => MeariClient} [deps.createClient]
    * @param {(options: object) => AlarmListener} [deps.createListener]
+   * @param {string|null} [deps.dataDir] persistence directory, null = memory
    */
   constructor(gladys, deps = {}) {
     this.gladys = gladys;
@@ -71,8 +87,12 @@ export class Runtime {
     this.motionTimers = new Map();
     this.doorbellTimers = new Map();
     this.motionActive = new Set();
-    this.images = new Map();
+    // deviceID -> { dataUri, base64, key, at, source }
+    this.snapshots = new Map();
+    this.snapshotGeneration = 0;
     this.lastImagePublish = new Map();
+    const dataDir = deps.dataDir !== undefined ? deps.dataDir : (process.env.DATA_DIR ?? '/data');
+    this.history = new DoorbellHistory(dataDir);
     this.lastPolls = new Map();
     this.iotByCamera = new Map();
   }
@@ -129,6 +149,8 @@ export class Runtime {
     });
     this.listener.start();
     await this.#status(true);
+    // In the background: a slow cloud must not delay the integration start.
+    this.seedFromCloud().catch((err) => logger.warn(`History seeding failed: ${err.message}`));
   }
 
   stop() {
@@ -201,13 +223,33 @@ export class Runtime {
 
   // --- alarms ----------------------------------------------------------------
 
+  hasDoorbell(camera) {
+    return hasDoorbell(camera, this.config);
+  }
+
+  /** Time of a live alarm: the cloud's when it is plausible, else now. */
+  #alarmTime(event) {
+    const now = Date.now();
+    const parsed = parseEventTime(event.raw);
+    return parsed !== null && Math.abs(now - parsed) < LIVE_EVENT_SKEW_MS ? parsed : now;
+  }
+
   async handleAlarm(camera, event, image) {
     const ids = cameraIds(this.gladys, camera);
-    if (image) {
-      await this.#storeImage(camera, image);
+    const fitted = image ? this.#fit(image) : null;
+    if (fitted) {
+      await this.#setSnapshot(camera, fitted, event.kind === 'doorbell' ? 'doorbell' : 'motion', Date.now());
     }
     if (event.kind === 'doorbell') {
-      await this.#ring(camera, ids);
+      const changed = this.history.add({
+        id: event.eventId || undefined,
+        deviceId: String(camera.deviceID),
+        at: this.#alarmTime(event),
+        image: fitted?.base64 ?? null,
+      });
+      // The second copy of a press (event log, with the picture) is not a new ring.
+      if (!event.repeat) await this.#ring(camera, ids);
+      if (changed) this.#refreshWidget(WIDGET_KEYS.HISTORY);
     } else if (event.kind === 'motion') {
       await this.#motion(camera, ids, event);
     }
@@ -269,35 +311,155 @@ export class Runtime {
     }
   }
 
-  async #storeImage(camera, jpegBuffer) {
-    const image = fitJpeg(jpegBuffer);
-    if (!image) {
-      logger.info('Event snapshot could not be reduced under 150 KB, skipped');
-      return;
-    }
-    const key = String(camera.deviceID);
-    this.images.set(key, image);
-    const now = Date.now();
-    if (now - (this.lastImagePublish.get(key) ?? 0) < IMAGE_MIN_INTERVAL_MS) return;
-    this.lastImagePublish.set(key, now);
+  #refreshWidget(key) {
     try {
-      await this.gladys.publishCameraImage(cameraIds(this.gladys, camera).device, image);
+      this.gladys.requestWidgetRefresh(key);
     } catch (err) {
-      logger.debug(`publishCameraImage failed: ${err.message}`);
+      logger.debug(`requestWidgetRefresh ${key} failed: ${err.message}`);
     }
   }
 
-  /** onGetImage: the last event snapshot (live capture is not supported yet). */
+  /** JPEG -> { dataUri, base64 } under the camera image budget, or null. */
+  #fit(jpegBuffer) {
+    const dataUri = fitJpeg(jpegBuffer);
+    if (!dataUri) {
+      logger.info('Snapshot could not be reduced under 150 KB, skipped');
+      return null;
+    }
+    return { dataUri, base64: dataUri.slice(dataUri.indexOf(',') + 1) };
+  }
+
+  /** Install a new camera picture: camera feature + widget. */
+  async #setSnapshot(camera, fitted, source, at) {
+    const key = String(camera.deviceID);
+    const current = this.snapshots.get(key);
+    if (current && current.at > at) return false;
+    this.snapshotGeneration += 1;
+    this.snapshots.set(key, {
+      ...fitted,
+      at,
+      source,
+      key: `cam-${key}-${Date.now().toString(36)}-${this.snapshotGeneration}`.toLowerCase().slice(0, 64),
+    });
+    this.#refreshWidget(WIDGET_KEYS.CAMERA);
+    const now = Date.now();
+    if (now - (this.lastImagePublish.get(key) ?? 0) >= IMAGE_MIN_INTERVAL_MS) {
+      this.lastImagePublish.set(key, now);
+      try {
+        await this.gladys.publishCameraImage(cameraIds(this.gladys, camera).device, fitted.dataUri);
+      } catch (err) {
+        logger.debug(`publishCameraImage failed: ${err.message}`);
+      }
+    }
+    return true;
+  }
+
+  /** { key, at, source } of the current picture of a camera, or null. */
+  snapshotInfo(camera) {
+    const snap = this.snapshots.get(String(camera.deviceID));
+    return snap ? { key: snap.key, at: snap.at, source: snap.source } : null;
+  }
+
+  /** onGetImage: the last picture (live capture is not supported yet). */
   getImage(device) {
     const camera = this.findCamera(device.external_id);
     if (!camera) {
       throw new Error('Unknown camera');
     }
-    const image = this.images.get(String(camera.deviceID));
-    if (!image) {
+    const snap = this.snapshots.get(String(camera.deviceID));
+    if (!snap) {
       throw new Error('No snapshot yet: one is taken at the next motion or doorbell press');
     }
-    return image;
+    return snap.dataUri;
+  }
+
+  /** onWidgetGetImage: raw base64 of a camera picture or a history picture. */
+  getWidgetImage(key) {
+    if (key.startsWith('cam-')) {
+      for (const snap of this.snapshots.values()) {
+        if (snap.key === key) return snap.base64;
+      }
+    } else if (key.startsWith('ring-')) {
+      const image = this.history.image(key);
+      if (image) return image;
+    }
+    throw new Error('Image no longer available');
+  }
+
+  // --- cloud event log (history, pictures) -------------------------------------
+
+  async #downloadEventImage(camera, entry) {
+    const url = findImageUrl(entry);
+    if (!url) return null;
+    const data = await this.client.downloadSnapshot(url);
+    const jpeg = data ? decodeEventSnapshot(data, camera.snNum) : null;
+    return jpeg ? this.#fit(jpeg) : null;
+  }
+
+  /**
+   * Rebuild the doorbell history and the last picture of each camera from the
+   * cloud event log, so both are filled right after a (re)start. Read-only on
+   * the cloud: it never wakes a camera up.
+   */
+  async seedFromCloud() {
+    const client = this.client;
+    if (!client) return;
+    let historyChanged = false;
+    for (const camera of this.cameras()) {
+      let presses = 0;
+      let pictureDone = this.snapshots.has(String(camera.deviceID));
+      for (let back = 0; back < HISTORY_SEED_DAYS; back += 1) {
+        if (presses >= HISTORY_SIZE && pictureDone) break;
+        let entries;
+        try {
+          entries = await client.getDeviceEvents(camera.deviceID, dayString(Date.now() - back * 86_400_000));
+        } catch (err) {
+          logger.debug(`Event log read failed: ${err.message}`);
+          break;
+        }
+        if (this.client !== client) return; // session replaced meanwhile
+        for (const entry of entries) {
+          const at = parseEventTime(entry);
+          if (!pictureDone && at !== null && findImageUrl(entry)) {
+            const fitted = await this.#downloadEventImage(camera, entry);
+            if (fitted) {
+              await this.#setSnapshot(camera, fitted, 'history', at);
+              pictureDone = true;
+            }
+          }
+          if (presses < HISTORY_SIZE && at !== null && classifyAlarm(Number(entry.eventType)) === 'doorbell') {
+            presses += 1;
+            const fitted = await this.#downloadEventImage(camera, entry);
+            historyChanged =
+              this.history.add({
+                id: eventLogId(entry) || undefined,
+                deviceId: String(camera.deviceID),
+                at,
+                image: fitted?.base64 ?? null,
+              }) || historyChanged;
+          }
+        }
+      }
+    }
+    if (historyChanged) this.#refreshWidget(WIDGET_KEYS.HISTORY);
+  }
+
+  /** Widget button: look for a picture newer than the current one. */
+  async refreshSnapshot(deviceExternalId) {
+    const camera = this.findCamera(deviceExternalId);
+    if (!camera || !this.client) return false;
+    const current = this.snapshots.get(String(camera.deviceID));
+    const entries = await this.client.getDeviceEvents(camera.deviceID, dayString(Date.now()));
+    for (const entry of entries) {
+      const at = parseEventTime(entry);
+      if (at === null || (current && at <= current.at)) continue;
+      const fitted = await this.#downloadEventImage(camera, entry);
+      if (fitted) {
+        const kind = classifyAlarm(Number(entry.eventType));
+        return this.#setSnapshot(camera, fitted, kind === 'doorbell' ? 'doorbell' : 'motion', at);
+      }
+    }
+    return false;
   }
 
   // --- polling and commands --------------------------------------------------

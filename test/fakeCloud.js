@@ -28,9 +28,9 @@ function checkSignature(params) {
   }
 }
 
-export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, battery = {} } = {}) {
+export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, battery = {}, images = {} } = {}) {
   const calls = [];
-  const state = { events, iot, battery, sets: [], password };
+  const state = { events, iot, battery, images, sets: [], password };
 
   const platformSignature = (() => {
     const expireTime = '1999999999';
@@ -99,8 +99,13 @@ export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, batt
         }
         return json({ iot: state.iot[params.deviceid] ?? {} });
       }
-      default:
+      default: {
+        const image = state.images[u.pathname];
+        if (image) {
+          return { ok: true, status: 200, arrayBuffer: async () => image.buffer.slice(image.byteOffset, image.byteOffset + image.length) };
+        }
         return { ok: false, status: 404, json: async () => ({}) };
+      }
     }
   }
 

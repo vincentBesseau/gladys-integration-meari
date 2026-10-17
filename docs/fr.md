@@ -16,6 +16,13 @@ Pour chaque caméra :
 
 Deux déclencheurs de scène : **Appui sur la sonnette** et **Mouvement détecté** (filtrable par personne ou autre mouvement).
 
+## Widgets du tableau de bord
+
+- **Caméra ieGeek** : la dernière image, la batterie et le mouvement. Une sonnette sur batterie dort entre deux événements : l'image est donc mise à jour à chaque alerte ou appui (le widget se rafraîchit aussitôt), sans jamais réveiller la caméra. Le bouton « Chercher une image » va voir dans le cloud s'il existe une image plus récente.
+- **Appuis sonnette** : les 5 derniers appuis, avec le jour et l'heure, et l'image prise au moment de l'appui quand le cloud en fournit une. L'historique est conservé par l'intégration et reconstruit depuis le cloud (7 derniers jours) au démarrage.
+
+Dans les réglages de chaque widget, choisissez la caméra (par défaut : la sonnette, ou toutes les sonnettes pour l'historique).
+
 ## Configuration
 
 1. **Créez un deuxième compte ieGeek Cam** et partagez-lui vos caméras depuis l'application. Le cloud n'accepte qu'une session temps réel par compte : avec le compte du téléphone, les alertes arrivent quand même, mais par interrogation (sous 15 secondes) au lieu d'être instantanées.

@@ -84,3 +84,16 @@ test('MQTT uses the user id as client id and the account topic', async () => {
   assert.equal(options.password, 'mqtt-sig');
   assert.deepEqual(options.topics, ['$bsssvr/iot/987654/987654/event/update/accepted']);
 });
+
+test('the second copy of a press is forwarded only when it brings a picture', async () => {
+  const { listener } = await setup();
+  const seen = [];
+  listener.onAlarm = (_camera, event) => seen.push([event.repeat, event.imageUrl]);
+  await listener.handlePayload({ deviceID: '1001', eventType: 3 }, 'push');
+  await listener.handlePayload({ deviceID: '1001', eventType: 3, msgID: 'a' }, 'poll');
+  await listener.handlePayload({ deviceID: '1001', eventType: 3, msgID: 'a', imageUrl: 'https://x/p.jpgx3' }, 'poll');
+  assert.deepEqual(seen, [
+    [false, ''],
+    [true, 'https://x/p.jpgx3'],
+  ]);
+});

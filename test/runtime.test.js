@@ -20,6 +20,7 @@ function setup(cloudOptions = {}) {
       new MeariClient({ email: config.email, password: config.password, fetch: cloud.fetch }),
     // No timers nor sockets in the tests: alarms are injected by hand.
     createListener: () => ({ start() {}, stop() {} }),
+    dataDir: null,
   });
   return { cloud, gladys, runtime };
 }

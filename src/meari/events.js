@@ -114,6 +114,7 @@ function normalize(raw, data, evtRaw) {
     alarmName: ALARM_TYPE_NAMES[alarmType] ?? `type=${evtRaw}`,
     kind: classifyAlarm(alarmType),
     person: PERSON_ALARM_TYPES.has(alarmType),
+    eventId: eventLogId(data) || eventLogId(raw),
     deviceId: deviceId === undefined ? '' : String(deviceId).trim(),
     licenseId: licenseId === undefined ? '' : String(licenseId).trim(),
     imageUrl: findImageUrl(raw),

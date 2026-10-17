@@ -16,6 +16,13 @@ For each camera:
 
 Two scene triggers: **Doorbell pressed** and **Motion detected** (filterable by person or other motion).
 
+## Dashboard widgets
+
+- **ieGeek camera**: the last picture, the battery and the motion. A battery doorbell sleeps between events, so the picture is updated at every alert or press (the widget refreshes at once), without ever waking the camera. The "Check for a new picture" button looks in the cloud for a newer one.
+- **Doorbell presses**: the last 5 presses, with the day and time, and the picture taken at the press when the cloud provides one. The history is kept by the integration and rebuilt from the cloud (last 7 days) at startup.
+
+In each widget's settings, pick the camera (default: the doorbell, or every doorbell for the history).
+
 ## Setup
 
 1. **Create a second ieGeek Cam account** and share your cameras with it from the app. The cloud allows a single live session per account: with the phone's account, alerts still arrive, but by polling (within 15 seconds) instead of instantly.
