@@ -1,0 +1,171 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "ieGeek Cam",
+  "description": {
+    "en": "ieGeek battery cameras and doorbells: motion, doorbell press, battery, snapshot.",
+    "fr": "Caméras et sonnettes ieGeek sur batterie : mouvement, appui sonnette, batterie, image."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/OWNER/gladys-integration-iegeek:0.1.0",
+  "gladys_version": ">=5.1.0",
+  "categories": ["security"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": { "en": "Your ieGeek Cam account", "fr": "Votre compte ieGeek Cam" },
+      "description": {
+        "en": "Use a SECOND account, with your cameras shared to it from the app: the ieGeek cloud allows a single live session per account, so using the phone account delays the alerts (15 s instead of instant).",
+        "fr": "Utilisez un DEUXIÈME compte, avec lequel vous partagez vos caméras depuis l'application : le cloud ieGeek n'accepte qu'une session temps réel par compte, et le compte du téléphone retarde les alertes (15 s au lieu d'instantané)."
+      }
+    },
+    {
+      "key": "email",
+      "type": "string",
+      "label": { "en": "E-mail", "fr": "E-mail" },
+      "placeholder": { "en": "name@example.com", "fr": "nom@exemple.fr" },
+      "required": true
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": { "en": "Password", "fr": "Mot de passe" },
+      "required": true
+    },
+    {
+      "key": "app_profile",
+      "type": "select",
+      "label": { "en": "App used to create the account", "fr": "Application utilisée pour créer le compte" },
+      "required": true,
+      "default": "iegeek",
+      "options": [
+        { "value": "iegeek", "label": { "en": "ieGeek Cam", "fr": "ieGeek Cam" } },
+        { "value": "cloudedge", "label": { "en": "CloudEdge", "fr": "CloudEdge" } },
+        { "value": "cloudplus", "label": { "en": "CloudPlus / CloudHome", "fr": "CloudPlus / CloudHome" } },
+        { "value": "anran", "label": { "en": "ANRAN", "fr": "ANRAN" } },
+        { "value": "boifun", "label": { "en": "BoifunCam", "fr": "BoifunCam" } },
+        { "value": "arenti", "label": { "en": "Arenti", "fr": "Arenti" } }
+      ]
+    },
+    {
+      "key": "country_code",
+      "type": "string",
+      "label": { "en": "Country code", "fr": "Code pays" },
+      "description": {
+        "en": "Two letters, as chosen in the app (FR, BE, CH...).",
+        "fr": "Deux lettres, comme dans l'application (FR, BE, CH...)."
+      },
+      "default": "FR"
+    },
+    {
+      "key": "phone_code",
+      "type": "string",
+      "label": { "en": "Phone dial code", "fr": "Indicatif téléphonique" },
+      "description": { "en": "Without the +, e.g. 33 for France.", "fr": "Sans le +, ex. 33 pour la France." },
+      "default": "33"
+    },
+    {
+      "key": "use_push",
+      "type": "boolean",
+      "label": { "en": "Instant alerts (push)", "fr": "Alertes instantanées (push)" },
+      "description": {
+        "en": "Listen to the cloud push channel. Off: alerts arrive by polling, within 15 s.",
+        "fr": "Écoute le canal push du cloud. Désactivé : les alertes arrivent par interrogation, sous 15 s."
+      },
+      "default": true
+    },
+    {
+      "key": "motion_timeout",
+      "type": "number",
+      "label": { "en": "Motion duration (s)", "fr": "Durée du mouvement (s)" },
+      "description": {
+        "en": "How long the motion sensor stays on after the last alert.",
+        "fr": "Durée pendant laquelle le capteur de mouvement reste actif après la dernière alerte."
+      },
+      "default": 60,
+      "min": 10,
+      "max": 3600
+    },
+    {
+      "key": "poll_frequency",
+      "type": "number",
+      "label": { "en": "Battery refresh (s)", "fr": "Rafraîchissement batterie (s)" },
+      "description": {
+        "en": "Battery and settings are read from the cloud, the camera is never woken up.",
+        "fr": "Batterie et réglages sont lus dans le cloud, la caméra n'est jamais réveillée."
+      },
+      "default": 300,
+      "min": 60,
+      "max": 3600
+    },
+    {
+      "key": "force_doorbell",
+      "type": "boolean",
+      "label": { "en": "Add a doorbell feature to every camera", "fr": "Ajouter une fonction sonnette à toutes les caméras" },
+      "description": {
+        "en": "Only if your doorbell is not detected as one.",
+        "fr": "Uniquement si votre sonnette n'est pas reconnue comme telle."
+      },
+      "default": false
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": { "en": "Test the connection", "fr": "Tester la connexion" },
+      "timeout_seconds": 60
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "doorbell_pressed",
+      "label": { "en": "Doorbell pressed", "fr": "Appui sur la sonnette" },
+      "description": {
+        "en": "Someone pressed the button of an ieGeek doorbell.",
+        "fr": "Quelqu'un a appuyé sur le bouton d'une sonnette ieGeek."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Doorbell", "fr": "Sonnette" }
+        }
+      ]
+    },
+    {
+      "key": "motion_detected",
+      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "description": {
+        "en": "An ieGeek camera detected a motion or a person.",
+        "fr": "Une caméra ieGeek a détecté un mouvement ou une personne."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": { "en": "Camera", "fr": "Caméra" }
+        },
+        {
+          "key": "target",
+          "type": "multi_select",
+          "label": { "en": "Detection", "fr": "Détection" },
+          "options": [
+            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
+            { "value": "motion", "label": { "en": "Other motion", "fr": "Autre mouvement" } }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "target",
+          "type": "string",
+          "label": { "en": "Detection", "fr": "Détection" }
+        }
+      ]
+    }
+  ]
+}
