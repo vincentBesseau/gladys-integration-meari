@@ -1,6 +1,6 @@
-# Gladys integration — ieGeek Cam
+# Gladys integration — Meari (ieGeek Cam, CloudEdge…)
 
-External integration for [Gladys Assistant](https://gladysassistant.com) (5.1+) bringing ieGeek battery cameras and doorbells (Meari cloud platform) to Gladys: motion, doorbell press, battery, event snapshot, a few camera settings, and two scene triggers.
+External integration for [Gladys Assistant](https://gladysassistant.com) (5.1+) bringing the cameras and doorbells of the Meari cloud platform to Gladys — the apps ieGeek Cam, CloudEdge, CloudPlus / CloudHome, ANRAN, Arenti and BoifunCam: motion, doorbell press, battery, event snapshot, a few camera settings, and two scene triggers.
 
 User documentation: [docs/fr.md](docs/fr.md) · [docs/en.md](docs/en.md).
 
@@ -39,4 +39,4 @@ DATA_DIR=./data LOG_LEVEL=debug npm start   # DATA_DIR: /data in the container
 
 ## Credits
 
-The Meari protocol work (authentication, signing, MQTT topics, event log, snapshot obfuscation) is ported from [Uxzylon/Ha-CloudPlus-Meari](https://github.com/Uxzylon/Ha-CloudPlus-Meari), MIT licensed. Unofficial: not affiliated with ieGeek or Meari.
+The Meari protocol work (authentication, signing, MQTT topics, event log, snapshot obfuscation) is ported from [Uxzylon/Ha-CloudPlus-Meari](https://github.com/Uxzylon/Ha-CloudPlus-Meari), MIT licensed. Unofficial: not affiliated with Meari or the app vendors.

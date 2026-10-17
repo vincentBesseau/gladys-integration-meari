@@ -1,13 +1,13 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "ieGeek Cam",
+  "name": "Meari",
   "description": {
-    "en": "ieGeek battery cameras and doorbells: motion, doorbell press, battery, snapshot.",
-    "fr": "Caméras et sonnettes ieGeek sur batterie : mouvement, appui sonnette, batterie, image."
+    "en": "Meari cameras & doorbells: ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam apps.",
+    "fr": "Caméras et sonnettes Meari : applis ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam."
   },
   "version": "0.1.0",
-  "docker_image": "ghcr.io/OWNER/gladys-integration-iegeek:0.1.0",
+  "docker_image": "ghcr.io/OWNER/gladys-integration-meari:0.1.0",
   "gladys_version": ">=5.1.0",
   "categories": [
     "security"
@@ -20,12 +20,12 @@
       "key": "intro",
       "type": "section",
       "label": {
-        "en": "Your ieGeek Cam account",
-        "fr": "Votre compte ieGeek Cam"
+        "en": "Your camera app account",
+        "fr": "Le compte de votre application caméra"
       },
       "description": {
-        "en": "Use a SECOND account, with your cameras shared to it from the app: the ieGeek cloud allows a single live session per account, so using the phone account delays the alerts (15 s instead of instant).",
-        "fr": "Utilisez un DEUXIÈME compte, avec lequel vous partagez vos caméras depuis l'application : le cloud ieGeek n'accepte qu'une session temps réel par compte, et le compte du téléphone retarde les alertes (15 s au lieu d'instantané)."
+        "en": "Meari is the cloud behind ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti and BoifunCam. Use a SECOND account of your app, with your cameras shared to it: the cloud allows one live session per account, so the phone's account delays alerts (15 s instead of instant).",
+        "fr": "Meari est le cloud derrière ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti et BoifunCam. Utilisez un DEUXIÈME compte de votre application, avec vos caméras partagées : le cloud n'accepte qu'une session temps réel par compte, et le compte du téléphone retarde les alertes (15 s au lieu d'instantané)."
       }
     },
     {
@@ -54,8 +54,8 @@
       "key": "app_profile",
       "type": "select",
       "label": {
-        "en": "App used to create the account",
-        "fr": "Application utilisée pour créer le compte"
+        "en": "Your camera app",
+        "fr": "Votre application caméra"
       },
       "required": true,
       "default": "iegeek",
@@ -205,8 +205,8 @@
         "fr": "Appui sur la sonnette"
       },
       "description": {
-        "en": "Someone pressed the button of an ieGeek doorbell.",
-        "fr": "Quelqu'un a appuyé sur le bouton d'une sonnette ieGeek."
+        "en": "Someone pressed the button of a doorbell.",
+        "fr": "Quelqu'un a appuyé sur le bouton d'une sonnette."
       },
       "fields": [
         {
@@ -227,8 +227,8 @@
         "fr": "Mouvement détecté"
       },
       "description": {
-        "en": "An ieGeek camera detected a motion or a person.",
-        "fr": "Une caméra ieGeek a détecté un mouvement ou une personne."
+        "en": "A camera detected a motion or a person.",
+        "fr": "Une caméra a détecté un mouvement ou une personne."
       },
       "fields": [
         {
@@ -281,8 +281,8 @@
     {
       "key": "camera_view",
       "label": {
-        "en": "ieGeek camera",
-        "fr": "Caméra ieGeek"
+        "en": "Meari camera",
+        "fr": "Caméra Meari"
       },
       "description": {
         "en": "Last picture, battery and motion. Updated at every alert, without waking the camera.",

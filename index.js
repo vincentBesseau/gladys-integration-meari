@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Entry point of the ieGeek Cam external integration for Gladys Assistant.
+// Entry point of the Meari external integration for Gladys Assistant.
 //
 // SDK wiring only: every handler is registered BEFORE connect(), the work is
 // done by src/runtime.js (cloud session, alarms, cameras).
@@ -58,7 +58,7 @@ gladys.handleShutdown((signal) => {
   runtime.stop();
 });
 
-logger.info('Starting the ieGeek Cam integration...');
+logger.info('Starting the Meari integration...');
 gladys.connect().catch((err) => {
   logger.error('Initial connection failed', err);
   process.exit(1);

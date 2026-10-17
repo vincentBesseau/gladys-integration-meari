@@ -104,7 +104,7 @@ export const WIDGETS = {
         components.push({
           type: 'image',
           key: snapshot.key,
-          alt: camera.deviceName || 'ieGeek',
+          alt: camera.deviceName || 'Camera',
           fit: 'cover',
         });
       } else {

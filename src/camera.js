@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Gladys device model of an ieGeek / Meari camera or doorbell.
+// Gladys device model of a Meari camera or doorbell.
 //
 // External ids are built from the cloud deviceID (stable for the life of the
 // pairing) and feature keys: both are forever, never rename them.
@@ -62,7 +62,7 @@ export function hasDoorbell(camera, config) {
  */
 export function buildCameraDevice(gladys, camera, config, iot = {}) {
   const ids = cameraIds(gladys, camera);
-  const name = String(camera.deviceName ?? '').trim() || `ieGeek ${camera.snNum}`;
+  const name = String(camera.deviceName ?? '').trim() || `Camera ${camera.snNum}`;
   const features = [
     {
       name: 'Image',

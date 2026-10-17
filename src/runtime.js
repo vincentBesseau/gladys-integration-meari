@@ -46,16 +46,16 @@ function dayString(t) {
 }
 
 const NOT_CONFIGURED = {
-  en: 'Enter the e-mail and password of your ieGeek Cam account.',
-  fr: 'Renseignez l’e-mail et le mot de passe de votre compte ieGeek Cam.',
+  en: 'Enter the e-mail and password of your camera app account.',
+  fr: 'Renseignez l’e-mail et le mot de passe du compte de votre application caméra.',
 };
 const AUTH_FAILED = {
   en: 'Login refused: check the e-mail, the password and the app (profile).',
   fr: 'Connexion refusée : vérifiez l’e-mail, le mot de passe et l’application (profil).',
 };
 const CLOUD_UNREACHABLE = {
-  en: 'The ieGeek cloud could not be reached, retrying in one minute.',
-  fr: 'Le cloud ieGeek est injoignable, nouvelle tentative dans une minute.',
+  en: 'The Meari cloud could not be reached, retrying in one minute.',
+  fr: 'Le cloud Meari est injoignable, nouvelle tentative dans une minute.',
 };
 
 export class Runtime {
