@@ -53,6 +53,17 @@ test('publishes one device per camera, accepted by Gladys', async () => {
   assert.ok(!garden.features.some((f) => f.category === 'doorbell'), 'no doorbell on a camera');
 });
 
+test('every feature declares min and max (Gladys refuses null ones)', async () => {
+  const { gladys, runtime } = setup({ iot: { DOORBELL01: { 106: 1, 108: 0, 150: 1, 103: 1 } } });
+  await runtime.applyConfig({ ...CONFIG, force_doorbell: true });
+  for (const device of gladys.fake.discoveredDevices) {
+    for (const feature of device.features) {
+      assert.equal(typeof feature.min, 'number', `${feature.name}: min`);
+      assert.equal(typeof feature.max, 'number', `${feature.name}: max`);
+    }
+  }
+});
+
 test('force_doorbell adds the doorbell feature to every camera', async () => {
   const { gladys, runtime } = setup();
   await runtime.applyConfig({ ...CONFIG, force_doorbell: true });

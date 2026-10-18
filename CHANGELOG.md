@@ -13,3 +13,7 @@
 - "Meari camera" dashboard widget: last picture, battery, motion, refreshed on every alert.
 - "Doorbell presses" dashboard widget: the last 5 presses with day, time and picture, persisted in /data and rebuilt from the cloud log.
 - Alarms through the cloud MQTT push, with a 15 s event-log polling fallback.
+
+### Fixed
+
+- The camera image feature now declares min/max: Gladys refused the device (HTTP 422) without them.

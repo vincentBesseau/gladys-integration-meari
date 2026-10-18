@@ -69,6 +69,10 @@ export function buildCameraDevice(gladys, camera, config, iot = {}) {
       external_id: ids.feature(FEATURE.IMAGE),
       category: CAT.CAMERA,
       type: TYPE.CAMERA.IMAGE,
+      // Not a numeric value, but Gladys stores min/max on every feature and
+      // refuses a device whose feature leaves them null (HTTP 422).
+      min: 0,
+      max: 0,
       read_only: true,
       has_feedback: false,
       keep_history: false,
