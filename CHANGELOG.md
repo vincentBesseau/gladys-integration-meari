@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The "Meari camera" widget now shows cameras only, never a doorbell (doorbells have their own "Doorbell presses" widget).
+- "Doorbell presses" items are now tappable: a press opens the core detail panel where its picture is shown enlarged.
+- Spanish (es) and German (de) added: every user-facing string (manifest config, widgets, action messages, scene triggers) is now provided in the four languages Gladys supports (en/fr/es/de) and resolved from the UI language, English as the fallback. Store docs translated too (docs/es.md, docs/de.md).
+- New "Language of device names" option (`device_language`): device feature names (Motion, Battery, Status LED...) are created in the chosen language. Gladys stores one (renamable) name per feature with no per-user language, so this is a config choice, applied at discovery.
+
 ### Added
 
 - Login with an account of any Meari app (ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam), camera discovery.

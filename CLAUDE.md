@@ -52,9 +52,13 @@ in README and LICENSE): check there first when the cloud behaves unexpectedly.
   passwords, tokens, serials or image URLs.
 - Never wake a battery camera: battery and settings come from the cloud cache,
   images from alert snapshots.
-- User-facing text is bilingual (en/fr): manifest, action messages, docs/en.md
-  and docs/fr.md kept in sync. Every user-visible change adds a CHANGELOG line
-  under `## [Unreleased]`.
+- User-facing text covers the four languages Gladys supports (en/fr/es/de),
+  `en` mandatory and the fallback: manifest, widgets, action messages and scene
+  triggers. Resolve by the `language` the widget handler receives (helper `tr`
+  in src/widgets.js). Device feature `name`s are single Gladys strings (no
+  per-user language), so they follow the `device_language` config, resolved at
+  discovery by `featureName` in src/camera.js. docs/{en,fr,es,de}.md are kept in
+  sync. Every user-visible change adds a CHANGELOG line under `## [Unreleased]`.
 - Unconfirmed on real hardware: the doorbell press alarm type (mapped to 3
   "Visitor" and 9 "Call" in src/meari/events.js) and the `eventTime` formats
   parsed in src/history.js. Unknown alarm types are logged as "Ignored alarm".

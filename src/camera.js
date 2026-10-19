@@ -29,11 +29,48 @@ export const FEATURE = {
 
 // Camera settings exposed as switches, when the camera reports the IoT code.
 export const IOT_SWITCHES = [
-  { key: FEATURE.SWITCH_MOTION_DETECTION, code: IOT.MOTION_DET_ENABLE, name: 'Motion detection' },
-  { key: FEATURE.SWITCH_PERSON_DETECTION, code: IOT.HUMAN_DET_ENABLE, name: 'Person detection' },
-  { key: FEATURE.SWITCH_PIR, code: IOT.PIR_DET_ENABLE, name: 'PIR sensor' },
-  { key: FEATURE.SWITCH_LED, code: IOT.LED_ENABLE, name: 'Status LED' },
+  { key: FEATURE.SWITCH_MOTION_DETECTION, code: IOT.MOTION_DET_ENABLE },
+  { key: FEATURE.SWITCH_PERSON_DETECTION, code: IOT.HUMAN_DET_ENABLE },
+  { key: FEATURE.SWITCH_PIR, code: IOT.PIR_DET_ENABLE },
+  { key: FEATURE.SWITCH_LED, code: IOT.LED_ENABLE },
 ];
+
+// Feature names in the four languages Gladys supports. Unlike widget text, a
+// Gladys feature carries a single (user-renamable) name, so the language is a
+// config choice (`device_language`) applied when the device is discovered.
+const FEATURE_NAMES = {
+  [FEATURE.IMAGE]: { en: 'Image', fr: 'Image', es: 'Imagen', de: 'Bild' },
+  [FEATURE.MOTION]: { en: 'Motion', fr: 'Mouvement', es: 'Movimiento', de: 'Bewegung' },
+  [FEATURE.DOORBELL]: { en: 'Doorbell', fr: 'Sonnette', es: 'Timbre', de: 'Türklingel' },
+  [FEATURE.BATTERY]: { en: 'Battery', fr: 'Batterie', es: 'Batería', de: 'Batterie' },
+  [FEATURE.CHARGING]: { en: 'Charging', fr: 'Charge', es: 'Carga', de: 'Laden' },
+  [FEATURE.SWITCH_MOTION_DETECTION]: {
+    en: 'Motion detection',
+    fr: 'Détection de mouvement',
+    es: 'Detección de movimiento',
+    de: 'Bewegungserkennung',
+  },
+  [FEATURE.SWITCH_PERSON_DETECTION]: {
+    en: 'Person detection',
+    fr: 'Détection de personne',
+    es: 'Detección de personas',
+    de: 'Personenerkennung',
+  },
+  [FEATURE.SWITCH_PIR]: { en: 'PIR sensor', fr: 'Capteur PIR', es: 'Sensor PIR', de: 'PIR-Sensor' },
+  [FEATURE.SWITCH_LED]: {
+    en: 'Status LED',
+    fr: 'LED d’état',
+    es: 'LED de estado',
+    de: 'Status-LED',
+  },
+};
+
+/** Feature name in the configured device language, English as the fallback. */
+export function featureName(key, language) {
+  const dict = FEATURE_NAMES[key] ?? {};
+  const lang = String(language || 'en').slice(0, 2);
+  return dict[lang] ?? dict.en ?? key;
+}
 
 export const SCENE_TRIGGERS = {
   MOTION: 'motion_detected',
@@ -62,10 +99,11 @@ export function hasDoorbell(camera, config) {
  */
 export function buildCameraDevice(gladys, camera, config, iot = {}) {
   const ids = cameraIds(gladys, camera);
+  const lang = config.device_language;
   const name = String(camera.deviceName ?? '').trim() || `Camera ${camera.snNum}`;
   const features = [
     {
-      name: 'Image',
+      name: featureName(FEATURE.IMAGE, lang),
       external_id: ids.feature(FEATURE.IMAGE),
       category: CAT.CAMERA,
       type: TYPE.CAMERA.IMAGE,
@@ -78,7 +116,7 @@ export function buildCameraDevice(gladys, camera, config, iot = {}) {
       keep_history: false,
     },
     {
-      name: 'Motion',
+      name: featureName(FEATURE.MOTION, lang),
       external_id: ids.feature(FEATURE.MOTION),
       category: CAT.MOTION_SENSOR,
       type: TYPE.SENSOR.BINARY,
@@ -92,7 +130,7 @@ export function buildCameraDevice(gladys, camera, config, iot = {}) {
 
   if (hasDoorbell(camera, config)) {
     features.push({
-      name: 'Doorbell',
+      name: featureName(FEATURE.DOORBELL, lang),
       external_id: ids.feature(FEATURE.DOORBELL),
       category: CAT.DOORBELL,
       type: TYPE.DOORBELL.RING,
@@ -107,7 +145,7 @@ export function buildCameraDevice(gladys, camera, config, iot = {}) {
   if (isBatteryCamera(camera) || IOT.BATTERY_PERCENT in iot || String(IOT.BATTERY_PERCENT) in iot) {
     features.push(
       {
-        name: 'Battery',
+        name: featureName(FEATURE.BATTERY, lang),
         external_id: ids.feature(FEATURE.BATTERY),
         category: CAT.BATTERY,
         type: TYPE.BATTERY.INTEGER,
@@ -119,7 +157,7 @@ export function buildCameraDevice(gladys, camera, config, iot = {}) {
         keep_history: true,
       },
       {
-        name: 'Charging',
+        name: featureName(FEATURE.CHARGING, lang),
         external_id: ids.feature(FEATURE.CHARGING),
         category: CAT.BATTERY,
         type: TYPE.BATTERY.CHARGING,
@@ -135,7 +173,7 @@ export function buildCameraDevice(gladys, camera, config, iot = {}) {
   for (const sw of IOT_SWITCHES) {
     if (iot[String(sw.code)] === undefined) continue;
     features.push({
-      name: sw.name,
+      name: featureName(sw.key, lang),
       external_id: ids.feature(sw.key),
       category: CAT.SWITCH,
       type: TYPE.SWITCH.BINARY,

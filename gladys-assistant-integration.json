@@ -4,7 +4,9 @@
   "name": "Meari",
   "description": {
     "en": "Meari cameras & doorbells: ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam apps.",
-    "fr": "Caméras et sonnettes Meari : applis ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam."
+    "fr": "Caméras et sonnettes Meari : applis ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam.",
+    "es": "Cámaras y timbres Meari: apps ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam.",
+    "de": "Meari-Kameras und -Türklingeln: Apps ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam."
   },
   "version": "0.1.0",
   "docker_image": "ghcr.io/OWNER/gladys-integration-meari:0.1.0",
@@ -17,11 +19,15 @@
       "type": "section",
       "label": {
         "en": "Your camera app account",
-        "fr": "Le compte de votre application caméra"
+        "fr": "Le compte de votre application caméra",
+        "es": "La cuenta de su aplicación de cámara",
+        "de": "Das Konto Ihrer Kamera-App"
       },
       "description": {
         "en": "Meari is the cloud behind ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti and BoifunCam. Use a SECOND account of your app, with your cameras shared to it: the cloud allows one live session per account, so the phone's account delays alerts (15 s instead of instant).",
-        "fr": "Meari est le cloud derrière ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti et BoifunCam. Utilisez un DEUXIÈME compte de votre application, avec vos caméras partagées : le cloud n'accepte qu'une session temps réel par compte, et le compte du téléphone retarde les alertes (15 s au lieu d'instantané)."
+        "fr": "Meari est le cloud derrière ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti et BoifunCam. Utilisez un DEUXIÈME compte de votre application, avec vos caméras partagées : le cloud n'accepte qu'une session temps réel par compte, et le compte du téléphone retarde les alertes (15 s au lieu d'instantané).",
+        "es": "Meari es la nube detrás de ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti y BoifunCam. Use una SEGUNDA cuenta de su aplicación, con sus cámaras compartidas: la nube solo admite una sesión en tiempo real por cuenta, por lo que la cuenta del teléfono retrasa las alertas (15 s en lugar de instantáneo).",
+        "de": "Meari ist die Cloud hinter ieGeek Cam, CloudEdge, CloudPlus/CloudHome, ANRAN, Arenti und BoifunCam. Verwenden Sie ein ZWEITES Konto Ihrer App, auf das Ihre Kameras geteilt sind: Die Cloud erlaubt nur eine Live-Sitzung pro Konto, daher verzögert das Konto des Telefons die Alarme (15 s statt sofort)."
       }
     },
     {
@@ -29,11 +35,15 @@
       "type": "string",
       "label": {
         "en": "E-mail",
-        "fr": "E-mail"
+        "fr": "E-mail",
+        "es": "Correo electrónico",
+        "de": "E-Mail"
       },
       "placeholder": {
         "en": "name@example.com",
-        "fr": "nom@exemple.fr"
+        "fr": "nom@exemple.fr",
+        "es": "nombre@ejemplo.com",
+        "de": "name@beispiel.de"
       },
       "required": true
     },
@@ -42,7 +52,9 @@
       "type": "secret",
       "label": {
         "en": "Password",
-        "fr": "Mot de passe"
+        "fr": "Mot de passe",
+        "es": "Contraseña",
+        "de": "Passwort"
       },
       "required": true
     },
@@ -51,7 +63,9 @@
       "type": "select",
       "label": {
         "en": "Your camera app",
-        "fr": "Votre application caméra"
+        "fr": "Votre application caméra",
+        "es": "Su aplicación de cámara",
+        "de": "Ihre Kamera-App"
       },
       "required": true,
       "default": "iegeek",
@@ -60,42 +74,54 @@
           "value": "iegeek",
           "label": {
             "en": "ieGeek Cam",
-            "fr": "ieGeek Cam"
+            "fr": "ieGeek Cam",
+            "es": "ieGeek Cam",
+            "de": "ieGeek Cam"
           }
         },
         {
           "value": "cloudedge",
           "label": {
             "en": "CloudEdge",
-            "fr": "CloudEdge"
+            "fr": "CloudEdge",
+            "es": "CloudEdge",
+            "de": "CloudEdge"
           }
         },
         {
           "value": "cloudplus",
           "label": {
             "en": "CloudPlus / CloudHome",
-            "fr": "CloudPlus / CloudHome"
+            "fr": "CloudPlus / CloudHome",
+            "es": "CloudPlus / CloudHome",
+            "de": "CloudPlus / CloudHome"
           }
         },
         {
           "value": "anran",
           "label": {
             "en": "ANRAN",
-            "fr": "ANRAN"
+            "fr": "ANRAN",
+            "es": "ANRAN",
+            "de": "ANRAN"
           }
         },
         {
           "value": "boifun",
           "label": {
             "en": "BoifunCam",
-            "fr": "BoifunCam"
+            "fr": "BoifunCam",
+            "es": "BoifunCam",
+            "de": "BoifunCam"
           }
         },
         {
           "value": "arenti",
           "label": {
             "en": "Arenti",
-            "fr": "Arenti"
+            "fr": "Arenti",
+            "es": "Arenti",
+            "de": "Arenti"
           }
         }
       ]
@@ -105,11 +131,15 @@
       "type": "string",
       "label": {
         "en": "Country code",
-        "fr": "Code pays"
+        "fr": "Code pays",
+        "es": "Código de país",
+        "de": "Ländercode"
       },
       "description": {
         "en": "Two letters, as chosen in the app (FR, BE, CH...).",
-        "fr": "Deux lettres, comme dans l'application (FR, BE, CH...)."
+        "fr": "Deux lettres, comme dans l'application (FR, BE, CH...).",
+        "es": "Dos letras, como en la aplicación (FR, BE, CH...).",
+        "de": "Zwei Buchstaben, wie in der App gewählt (FR, BE, CH...)."
       },
       "default": "FR"
     },
@@ -118,11 +148,15 @@
       "type": "string",
       "label": {
         "en": "Phone dial code",
-        "fr": "Indicatif téléphonique"
+        "fr": "Indicatif téléphonique",
+        "es": "Prefijo telefónico",
+        "de": "Telefonvorwahl"
       },
       "description": {
         "en": "Without the +, e.g. 33 for France.",
-        "fr": "Sans le +, ex. 33 pour la France."
+        "fr": "Sans le +, ex. 33 pour la France.",
+        "es": "Sin el +, p. ej. 33 para Francia.",
+        "de": "Ohne das +, z. B. 33 für Frankreich."
       },
       "default": "33"
     },
@@ -131,11 +165,15 @@
       "type": "boolean",
       "label": {
         "en": "Instant alerts (push)",
-        "fr": "Alertes instantanées (push)"
+        "fr": "Alertes instantanées (push)",
+        "es": "Alertas instantáneas (push)",
+        "de": "Sofortige Benachrichtigungen (Push)"
       },
       "description": {
         "en": "Listen to the cloud push channel. Off: alerts arrive by polling, within 15 s.",
-        "fr": "Écoute le canal push du cloud. Désactivé : les alertes arrivent par interrogation, sous 15 s."
+        "fr": "Écoute le canal push du cloud. Désactivé : les alertes arrivent par interrogation, sous 15 s.",
+        "es": "Escucha el canal push de la nube. Desactivado: las alertas llegan por sondeo, en menos de 15 s.",
+        "de": "Lauscht am Push-Kanal der Cloud. Aus: Alarme kommen per Abfrage, innerhalb von 15 s."
       },
       "default": true
     },
@@ -144,11 +182,15 @@
       "type": "number",
       "label": {
         "en": "Motion duration (s)",
-        "fr": "Durée du mouvement (s)"
+        "fr": "Durée du mouvement (s)",
+        "es": "Duración del movimiento (s)",
+        "de": "Bewegungsdauer (s)"
       },
       "description": {
         "en": "How long the motion sensor stays on after the last alert.",
-        "fr": "Durée pendant laquelle le capteur de mouvement reste actif après la dernière alerte."
+        "fr": "Durée pendant laquelle le capteur de mouvement reste actif après la dernière alerte.",
+        "es": "Cuánto tiempo permanece activo el sensor de movimiento tras la última alerta.",
+        "de": "Wie lange der Bewegungssensor nach dem letzten Alarm aktiv bleibt."
       },
       "default": 60,
       "min": 10,
@@ -159,11 +201,15 @@
       "type": "number",
       "label": {
         "en": "Battery refresh (s)",
-        "fr": "Rafraîchissement batterie (s)"
+        "fr": "Rafraîchissement batterie (s)",
+        "es": "Actualización de batería (s)",
+        "de": "Batterie-Aktualisierung (s)"
       },
       "description": {
         "en": "Battery and settings are read from the cloud, the camera is never woken up.",
-        "fr": "Batterie et réglages sont lus dans le cloud, la caméra n'est jamais réveillée."
+        "fr": "Batterie et réglages sont lus dans le cloud, la caméra n'est jamais réveillée.",
+        "es": "La batería y los ajustes se leen de la nube; la cámara nunca se despierta.",
+        "de": "Batterie und Einstellungen werden aus der Cloud gelesen, die Kamera wird nie geweckt."
       },
       "default": 300,
       "min": 60,
@@ -174,13 +220,52 @@
       "type": "boolean",
       "label": {
         "en": "Add a doorbell feature to every camera",
-        "fr": "Ajouter une fonction sonnette à toutes les caméras"
+        "fr": "Ajouter une fonction sonnette à toutes les caméras",
+        "es": "Añadir una función de timbre a todas las cámaras",
+        "de": "Jeder Kamera eine Türklingel-Funktion hinzufügen"
       },
       "description": {
         "en": "Only if your doorbell is not detected as one.",
-        "fr": "Uniquement si votre sonnette n'est pas reconnue comme telle."
+        "fr": "Uniquement si votre sonnette n'est pas reconnue comme telle.",
+        "es": "Solo si su timbre no se detecta como tal.",
+        "de": "Nur wenn Ihre Türklingel nicht als solche erkannt wird."
       },
       "default": false
+    },
+    {
+      "key": "device_language",
+      "type": "select",
+      "label": {
+        "en": "Language of device names",
+        "fr": "Langue des noms d'appareils",
+        "es": "Idioma de los nombres de dispositivos",
+        "de": "Sprache der Gerätenamen"
+      },
+      "description": {
+        "en": "Language of the created feature names (Motion, Battery, Status LED...). Applied when a camera is added; rename a feature anytime in Gladys.",
+        "fr": "Langue des noms des fonctionnalités créées (Mouvement, Batterie, LED d'état...). Appliquée à l'ajout d'une caméra ; renommable à tout moment dans Gladys.",
+        "es": "Idioma de los nombres de las funciones creadas (Movimiento, Batería, LED de estado...). Se aplica al añadir una cámara; puede renombrarlas en Gladys cuando quiera.",
+        "de": "Sprache der erstellten Funktionsnamen (Bewegung, Batterie, Status-LED...). Wird beim Hinzufügen einer Kamera angewendet; jederzeit in Gladys umbenennbar."
+      },
+      "default": "en",
+      "options": [
+        {
+          "value": "en",
+          "label": { "en": "English", "fr": "English", "es": "English", "de": "English" }
+        },
+        {
+          "value": "fr",
+          "label": { "en": "Français", "fr": "Français", "es": "Français", "de": "Français" }
+        },
+        {
+          "value": "es",
+          "label": { "en": "Español", "fr": "Español", "es": "Español", "de": "Español" }
+        },
+        {
+          "value": "de",
+          "label": { "en": "Deutsch", "fr": "Deutsch", "es": "Deutsch", "de": "Deutsch" }
+        }
+      ]
     }
   ],
   "actions": [
@@ -188,7 +273,9 @@
       "key": "test_connection",
       "label": {
         "en": "Test the connection",
-        "fr": "Tester la connexion"
+        "fr": "Tester la connexion",
+        "es": "Probar la conexión",
+        "de": "Verbindung testen"
       },
       "timeout_seconds": 60
     }
@@ -198,11 +285,15 @@
       "key": "doorbell_pressed",
       "label": {
         "en": "Doorbell pressed",
-        "fr": "Appui sur la sonnette"
+        "fr": "Appui sur la sonnette",
+        "es": "Timbre pulsado",
+        "de": "Türklingel gedrückt"
       },
       "description": {
         "en": "Someone pressed the button of a doorbell.",
-        "fr": "Quelqu'un a appuyé sur le bouton d'une sonnette."
+        "fr": "Quelqu'un a appuyé sur le bouton d'une sonnette.",
+        "es": "Alguien pulsó el botón de un timbre.",
+        "de": "Jemand hat den Knopf einer Türklingel gedrückt."
       },
       "fields": [
         {
@@ -211,7 +302,9 @@
           "source": "devices",
           "label": {
             "en": "Doorbell",
-            "fr": "Sonnette"
+            "fr": "Sonnette",
+            "es": "Timbre",
+            "de": "Türklingel"
           }
         }
       ]
@@ -220,11 +313,15 @@
       "key": "motion_detected",
       "label": {
         "en": "Motion detected",
-        "fr": "Mouvement détecté"
+        "fr": "Mouvement détecté",
+        "es": "Movimiento detectado",
+        "de": "Bewegung erkannt"
       },
       "description": {
         "en": "A camera detected a motion or a person.",
-        "fr": "Une caméra a détecté un mouvement ou une personne."
+        "fr": "Une caméra a détecté un mouvement ou une personne.",
+        "es": "Una cámara detectó un movimiento o una persona.",
+        "de": "Eine Kamera hat eine Bewegung oder eine Person erkannt."
       },
       "fields": [
         {
@@ -233,7 +330,9 @@
           "source": "devices",
           "label": {
             "en": "Camera",
-            "fr": "Caméra"
+            "fr": "Caméra",
+            "es": "Cámara",
+            "de": "Kamera"
           }
         },
         {
@@ -241,21 +340,27 @@
           "type": "multi_select",
           "label": {
             "en": "Detection",
-            "fr": "Détection"
+            "fr": "Détection",
+            "es": "Detección",
+            "de": "Erkennung"
           },
           "options": [
             {
               "value": "person",
               "label": {
                 "en": "Person",
-                "fr": "Personne"
+                "fr": "Personne",
+                "es": "Persona",
+                "de": "Person"
               }
             },
             {
               "value": "motion",
               "label": {
                 "en": "Other motion",
-                "fr": "Autre mouvement"
+                "fr": "Autre mouvement",
+                "es": "Otro movimiento",
+                "de": "Andere Bewegung"
               }
             }
           ]
@@ -267,7 +372,9 @@
           "type": "string",
           "label": {
             "en": "Detection",
-            "fr": "Détection"
+            "fr": "Détection",
+            "es": "Detección",
+            "de": "Erkennung"
           }
         }
       ]
@@ -278,11 +385,15 @@
       "key": "camera_view",
       "label": {
         "en": "Meari camera",
-        "fr": "Caméra Meari"
+        "fr": "Caméra Meari",
+        "es": "Cámara Meari",
+        "de": "Meari-Kamera"
       },
       "description": {
         "en": "Last picture, battery and motion. Updated at every alert, without waking the camera.",
-        "fr": "Dernière image, batterie et mouvement. Mise à jour à chaque alerte, sans réveiller la caméra."
+        "fr": "Dernière image, batterie et mouvement. Mise à jour à chaque alerte, sans réveiller la caméra.",
+        "es": "Última imagen, batería y movimiento. Se actualiza en cada alerta, sin despertar la cámara.",
+        "de": "Letztes Bild, Batterie und Bewegung. Bei jedem Alarm aktualisiert, ohne die Kamera zu wecken."
       },
       "icon": "camera",
       "action_timeout_seconds": 30,
@@ -292,8 +403,10 @@
           "type": "select",
           "source": "devices",
           "label": {
-            "en": "Camera (default: the doorbell)",
-            "fr": "Caméra (par défaut : la sonnette)"
+            "en": "Camera",
+            "fr": "Caméra",
+            "es": "Cámara",
+            "de": "Kamera"
           }
         }
       ]
@@ -302,11 +415,15 @@
       "key": "doorbell_history",
       "label": {
         "en": "Doorbell presses",
-        "fr": "Appuis sonnette"
+        "fr": "Appuis sonnette",
+        "es": "Pulsaciones del timbre",
+        "de": "Klingelereignisse"
       },
       "description": {
         "en": "The last 5 doorbell presses, day and time, with the picture taken at the press.",
-        "fr": "Les 5 derniers appuis sur la sonnette, jour et heure, avec l'image prise à l'appui."
+        "fr": "Les 5 derniers appuis sur la sonnette, jour et heure, avec l'image prise à l'appui.",
+        "es": "Las últimas 5 pulsaciones del timbre, día y hora, con la imagen tomada al pulsar.",
+        "de": "Die letzten 5 Klingelereignisse, Tag und Uhrzeit, mit dem beim Drücken aufgenommenen Bild."
       },
       "icon": "bell",
       "settings": [
@@ -316,7 +433,9 @@
           "source": "devices",
           "label": {
             "en": "Doorbell (default: all)",
-            "fr": "Sonnette (par défaut : toutes)"
+            "fr": "Sonnette (par défaut : toutes)",
+            "es": "Timbre (por defecto: todos)",
+            "de": "Türklingel (Standard: alle)"
           }
         }
       ]

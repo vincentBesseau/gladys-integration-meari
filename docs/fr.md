@@ -30,7 +30,7 @@ Deux déclencheurs de scène : **Appui sur la sonnette** et **Mouvement détect�
 - **Caméra Meari** : la dernière image, la batterie et le mouvement. Une sonnette sur batterie dort entre deux événements : l'image est donc mise à jour à chaque alerte ou appui (le widget se rafraîchit aussitôt), sans jamais réveiller la caméra. Le bouton « Chercher une image » va voir dans le cloud s'il existe une image plus récente.
 - **Appuis sonnette** : les 5 derniers appuis, avec le jour et l'heure, et l'image prise au moment de l'appui quand le cloud en fournit une. L'historique est conservé par l'intégration et reconstruit depuis le cloud (7 derniers jours) au démarrage.
 
-Dans les réglages de chaque widget, choisissez la caméra (par défaut : la sonnette, ou toutes les sonnettes pour l'historique).
+Dans le widget **Caméra Meari**, choisissez une caméra — les sonnettes sont exclues, elles ont leur propre widget. Dans **Appuis sonnette**, choisissez une sonnette (par défaut : toutes) ; appuyez sur un appui pour ouvrir son image en grand.
 
 ## Configuration
 

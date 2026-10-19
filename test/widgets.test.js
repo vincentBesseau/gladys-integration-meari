@@ -130,6 +130,8 @@ test('a press without picture, then its picture: history widget with image', asy
   assert.equal(list.items.length, 1);
   assert.equal(list.items[0].subtitle, 'Aujourd’hui');
   assert.match(list.items[0].title, /^\d\d:\d\d$/);
+  // A description makes the item tappable so its picture opens enlarged.
+  assert.match(list.items[0].description, /Appui sonnette/);
 
   const image = await gladys.fake.widgetGetImage(list.items[0].image);
   assert.equal(image.success, true);
@@ -147,6 +149,7 @@ test('startup rebuilds the history and the camera picture from the cloud log', a
     images: {
       '/img/a.jpgx3': obfuscate(makeJpeg(200), sn),
       '/img/b.jpgx3': obfuscate(makeJpeg(60), sn),
+      '/img/g.jpgx3': obfuscate(makeJpeg(120), 'XXXXGARDEN0002'),
     },
   };
   const { gladys, runtime, cloud: fake } = setup(cloud);
@@ -178,10 +181,23 @@ test('startup rebuilds the history and the camera picture from the cloud log', a
       fetch: async (url, init) => {
         const u = new URL(url);
         if (u.pathname === '/v3/app/event/list') {
-          fake.state.events[u.searchParams.get('deviceID')] =
-            u.searchParams.get('deviceID') === '1001'
-              ? (logs[u.searchParams.get('day')] ?? [])
-              : [];
+          const device = u.searchParams.get('deviceID');
+          const requestedDay = u.searchParams.get('day');
+          if (device === '1001') {
+            fake.state.events[device] = logs[requestedDay] ?? [];
+          } else if (device === '1002' && requestedDay === day(now)) {
+            // The standalone camera has its own fresh snapshot in the log.
+            fake.state.events[device] = [
+              {
+                msgID: 'g1',
+                eventType: 20,
+                eventTime: stamp(now),
+                imageUrl: 'https://cdn.example/img/g.jpgx3',
+              },
+            ];
+          } else {
+            fake.state.events[device] = [];
+          }
         }
         return original(url, init);
       },
@@ -202,9 +218,11 @@ test('startup rebuilds the history and the camera picture from the cloud log', a
   assert.ok(image, 'camera picture shown');
   const bytes = await gladys.fake.widgetGetImage(image.key);
   assert.deepEqual(validateWidgetImage(bytes.data.image), []);
-  // The doorbell is picked by default, and its battery tile is live.
+  // The "Meari camera" widget excludes doorbells: the standalone camera (1002)
+  // is picked, not the doorbell (1001), and its battery tile is live.
+  const garden = runtime.cameras().find((c) => c.deviceID === 1002);
   const battery = content.components.find((c) => c.type === 'value' && c.icon === 'battery');
-  assert.equal(battery.device_feature, cameraIds(gladys, runtime.cameras()[0]).feature('battery'));
+  assert.equal(battery.device_feature, cameraIds(gladys, garden).feature('battery'));
   runtime.stop();
 });
 

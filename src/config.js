@@ -15,7 +15,13 @@ export const DEFAULT_CONFIG = {
   motion_timeout: 60,
   poll_frequency: 300,
   force_doorbell: false,
+  // Language of the device feature names set at discovery. Gladys stores a
+  // single (user-renamable) name per feature, with no per-user language, so the
+  // language is a config choice; widgets and config text follow the UI language.
+  device_language: 'en',
 };
+
+export const DEVICE_LANGUAGES = ['en', 'fr', 'es', 'de'];
 
 const clamp = (value, min, max, fallback) => {
   const n = Number(value);
@@ -41,6 +47,9 @@ export function normalizeConfig(raw = {}) {
     motion_timeout: clamp(raw.motion_timeout, 10, 3600, DEFAULT_CONFIG.motion_timeout),
     poll_frequency: clamp(raw.poll_frequency, 60, 3600, DEFAULT_CONFIG.poll_frequency),
     force_doorbell: raw.force_doorbell === true,
+    device_language: DEVICE_LANGUAGES.includes(String(raw.device_language))
+      ? String(raw.device_language)
+      : DEFAULT_CONFIG.device_language,
   };
 }
 
