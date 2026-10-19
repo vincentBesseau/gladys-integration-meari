@@ -43,8 +43,20 @@ export const APP_PROFILES = {
     encryptedLogin: true,
   },
   cloudplus: { sourceApp: '77', appVer: '6.0.1', appVerCode: '1029', partnerId: '77' },
-  anran: { sourceApp: '84', appVer: '6.2.0', appVerCode: '1069', partnerId: '84', encryptedLogin: true },
-  boifun: { sourceApp: '104', appVer: '6.2.0', appVerCode: '1039', partnerId: '104', encryptedLogin: true },
+  anran: {
+    sourceApp: '84',
+    appVer: '6.2.0',
+    appVerCode: '1069',
+    partnerId: '84',
+    encryptedLogin: true,
+  },
+  boifun: {
+    sourceApp: '104',
+    appVer: '6.2.0',
+    appVerCode: '1039',
+    partnerId: '104',
+    encryptedLogin: true,
+  },
   arenti: {
     sourceApp: '39',
     appVer: '5.0.3',
@@ -214,7 +226,14 @@ export class MeariClient {
    * @param {string} [options.appProfile]
    * @param {typeof fetch} [options.fetch] injected in tests
    */
-  constructor({ email, password, countryCode = 'FR', phoneCode = '33', appProfile = 'iegeek', fetch: fetchImpl } = {}) {
+  constructor({
+    email,
+    password,
+    countryCode = 'FR',
+    phoneCode = '33',
+    appProfile = 'iegeek',
+    fetch: fetchImpl,
+  } = {}) {
     this.email = email;
     this.password = password;
     this.countryCode = String(countryCode || 'FR').toUpperCase();
@@ -545,6 +564,16 @@ export class MeariClient {
       }
     } catch (err) {
       logger.debug(`Home list failed: ${err.message}`);
+    }
+    // A background re-login (listener) refreshes devices on every retry. When
+    // both list calls come back empty on a transient failure (fetch failed, a
+    // non-1001 code mid-session), overwriting would drop every known camera and
+    // the dashboard widgets fall back to "no camera". Keep the previous list
+    // instead: a real device removal shows up as a non-empty list that replaces
+    // it, and the first login simply has nothing to preserve.
+    if (devices.size === 0 && this.devices.size > 0) {
+      logger.warn(`Device refresh returned nothing; keeping ${this.devices.size} known device(s).`);
+      return [...this.devices.values()];
     }
     this.devices = devices;
     return [...devices.values()];

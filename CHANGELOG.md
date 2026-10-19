@@ -17,3 +17,5 @@
 ### Fixed
 
 - The camera image feature now declares min/max: Gladys refused the device (HTTP 422) without them.
+- A background re-login no longer drops the known cameras when the cloud briefly fails to list devices: the dashboard widgets kept showing "no camera available" / "camera not found" until the next full discovery.
+- The image now makes its files readable by the unprivileged `node` user: a restrictive host umask (0600 source files) made the container crash with `EACCES: permission denied, open '/app/index.js'`.

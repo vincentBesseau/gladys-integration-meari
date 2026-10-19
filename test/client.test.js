@@ -41,6 +41,29 @@ test('a wrong password is an auth error', async () => {
   await assert.rejects(newClient(cloud, 'nope').login(), MeariAuthError);
 });
 
+test('a transient empty device refresh keeps the known cameras', async () => {
+  const cloud = createFakeCloud();
+  const client = newClient(cloud);
+  await client.login();
+  const before = client.cameras().map((c) => c.deviceID);
+  assert.deepEqual(before, [1001, 1002]);
+  // Background re-login while the cloud briefly fails to list devices.
+  cloud.state.deviceListFails = true;
+  await client.login();
+  assert.deepEqual(
+    client.cameras().map((c) => c.deviceID),
+    before,
+    'cameras survive a transient empty refresh',
+  );
+  // Once the cloud recovers, the real list takes over again.
+  cloud.state.deviceListFails = false;
+  await client.refreshDevices();
+  assert.deepEqual(
+    client.cameras().map((c) => c.deviceID),
+    [1001, 1002],
+  );
+});
+
 test('reads battery, reads and writes IoT settings through the OpenAPI', async () => {
   const cloud = createFakeCloud({
     battery: { XXXXDOORBELL01: { 154: { value: 87 }, 156: 0 } },
@@ -62,7 +85,12 @@ test('helpers', () => {
   assert.equal(formatSn('XXXXDOORBELL01'), 'DOORBELL01');
   assert.deepEqual(passwordVariants("it's"), ["it's", 'it\u2019s']);
   assert.match(meariTimestamp(new Date()), /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}GMT[+-]\d\d:00$/);
-  const devices = collectDevices({ result: { snap: [{ deviceID: 1, snNum: 'A' }], deviceList: [{ deviceID: 2, snNum: 'B', devTypeID: 5 }] } });
+  const devices = collectDevices({
+    result: {
+      snap: [{ deviceID: 1, snNum: 'A' }],
+      deviceList: [{ deviceID: 2, snNum: 'B', devTypeID: 5 }],
+    },
+  });
   assert.equal(devices.get('1')._category, 'snap');
   assert.equal(devices.get('2')._category, 'snap', 'devTypeID 5 = battery camera');
 });

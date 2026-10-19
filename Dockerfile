@@ -24,6 +24,12 @@ COPY index.js ./
 COPY src ./src
 COPY gladys-assistant-integration.json ./
 
+# COPY keeps the host's file modes and assigns them to root. A restrictive host
+# umask (0600 files) would then be unreadable by the unprivileged `node` user
+# and the container crashes with EACCES on index.js. Make the app world-readable
+# (and directories traversable) so it runs whatever the host permissions are.
+RUN chmod -R a+rX /app
+
 # The only writable location allowed at runtime. Docker creates a new volume
 # with the owner of the image's /data, so it must belong to `node`, and before
 # VOLUME: changes made to /data after it are discarded. Without this, /data is

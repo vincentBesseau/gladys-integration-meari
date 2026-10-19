@@ -14,7 +14,12 @@ export const CAMERAS = [
 ];
 
 function json(body) {
-  return { ok: true, status: 200, json: async () => body, arrayBuffer: async () => new ArrayBuffer(0) };
+  return {
+    ok: true,
+    status: 200,
+    json: async () => body,
+    arrayBuffer: async () => new ArrayBuffer(0),
+  };
 }
 
 function checkSignature(params) {
@@ -28,14 +33,25 @@ function checkSignature(params) {
   }
 }
 
-export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, battery = {}, images = {} } = {}) {
+export function createFakeCloud({
+  password = 'pa$$',
+  events = {},
+  iot = {},
+  battery = {},
+  images = {},
+} = {}) {
   const calls = [];
   const state = { events, iot, battery, images, sets: [], password };
 
   const platformSignature = (() => {
     const expireTime = '1999999999';
-    const key16 = Buffer.from(`${USER_ID}81a${expireTime}`).toString('base64').replace(/=+$/, '').slice(0, 16);
-    const info = Buffer.from(JSON.stringify({ accessid: 'ACCESS', accesskey: ACCESS_KEY })).toString('base64');
+    const key16 = Buffer.from(`${USER_ID}81a${expireTime}`)
+      .toString('base64')
+      .replace(/=+$/, '')
+      .slice(0, 16);
+    const info = Buffer.from(
+      JSON.stringify({ accessid: 'ACCESS', accesskey: ACCESS_KEY }),
+    ).toString('base64');
     return { signature: aesEncrypt(`${info}-x`, key16), expireTime };
   })();
 
@@ -48,7 +64,10 @@ export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, batt
 
     switch (u.pathname) {
       case '/ppstrongs/redirect':
-        return json({ resultCode: '1001', result: { apiServer: 'https://apis-eu-frankfurt.cloudedge360.com' } });
+        return json({
+          resultCode: '1001',
+          result: { apiServer: 'https://apis-eu-frankfurt.cloudedge360.com' },
+        });
       case '/meari/app/login':
         if (params.password !== desEncrypt(state.password)) {
           return json({ resultCode: '1004', resultMsg: 'password error' });
@@ -68,6 +87,11 @@ export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, batt
         });
       case '/v1/app/device/info/get':
         checkSignature(params);
+        // A transient mid-session failure: the list call answers without the
+        // success code (so no devices are collected), mimicking a flaky cloud.
+        if (state.deviceListFails) {
+          return json({ resultCode: '5000', resultMsg: 'temporary error' });
+        }
         return json({
           resultCode: '1001',
           doorbell: [CAMERAS[0]],
@@ -102,7 +126,12 @@ export function createFakeCloud({ password = 'pa$$', events = {}, iot = {}, batt
       default: {
         const image = state.images[u.pathname];
         if (image) {
-          return { ok: true, status: 200, arrayBuffer: async () => image.buffer.slice(image.byteOffset, image.byteOffset + image.length) };
+          return {
+            ok: true,
+            status: 200,
+            arrayBuffer: async () =>
+              image.buffer.slice(image.byteOffset, image.byteOffset + image.length),
+          };
         }
         return { ok: false, status: 404, json: async () => ({}) };
       }
