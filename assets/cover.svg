@@ -1,0 +1,27 @@
+<svg width="800" height="534" viewBox="0 0 800 534" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="800" height="534" fill="#0B2A3A"/>
+  <rect x="1" y="1" width="798" height="532" fill="none" stroke="#163C4E" stroke-width="2"/>
+
+  <circle cx="180" cy="250" r="168" fill="#0E3647"/>
+
+  <rect x="116" y="104" width="128" height="292" rx="34" fill="#102E3C" stroke="#34D1BF" stroke-width="4"/>
+  <circle cx="180" cy="196" r="56" fill="#0A222E" stroke="#34D1BF" stroke-width="4"/>
+  <circle cx="180" cy="196" r="30" fill="#0B2A3A"/>
+  <circle cx="194" cy="183" r="10" fill="#7FE9DA"/>
+  <circle cx="180" cy="326" r="24" fill="#0A222E" stroke="#34D1BF" stroke-width="4"/>
+  <circle cx="180" cy="326" r="10" fill="#34D1BF"/>
+  <circle cx="180" cy="128" r="5" fill="#7FE9DA"/>
+
+  <g fill="none" stroke="#34D1BF" stroke-width="4.5" stroke-linecap="round" opacity="0.9">
+    <path d="M270 164 a36 36 0 0 1 0 64"/>
+    <path d="M291 148 a62 62 0 0 1 0 96" opacity="0.55"/>
+  </g>
+
+  <text x="330" y="214" font-family="'Helvetica Neue', Arial, sans-serif" font-size="92" font-weight="600" fill="#FFFFFF" letter-spacing="1">Meari</text>
+  <rect x="334" y="238" width="90" height="5" rx="2.5" fill="#34D1BF"/>
+  <text x="332" y="298" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="400" fill="#CFE3EA">Caméras &amp; sonnettes</text>
+  <text x="332" y="338" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="400" fill="#CFE3EA">pour Gladys Assistant</text>
+
+  <text x="400" y="474" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="400" fill="#7FA6B5">ieGeek · CloudEdge · CloudPlus · ANRAN · Arenti · BoifunCam</text>
+  <text x="400" y="504" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="400" fill="#4E7384">fr · en · es · de</text>
+</svg>
