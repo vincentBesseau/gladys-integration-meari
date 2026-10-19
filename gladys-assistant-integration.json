@@ -231,6 +231,41 @@
         "de": "Nur wenn Ihre Türklingel nicht als solche erkannt wird."
       },
       "default": false
+    },
+    {
+      "key": "device_language",
+      "type": "select",
+      "label": {
+        "en": "Language of device names",
+        "fr": "Langue des noms d'appareils",
+        "es": "Idioma de los nombres de dispositivos",
+        "de": "Sprache der Gerätenamen"
+      },
+      "description": {
+        "en": "Language of the created feature names (Motion, Battery, Status LED...). Applied when a camera is added; rename a feature anytime in Gladys.",
+        "fr": "Langue des noms des fonctionnalités créées (Mouvement, Batterie, LED d'état...). Appliquée à l'ajout d'une caméra ; renommable à tout moment dans Gladys.",
+        "es": "Idioma de los nombres de las funciones creadas (Movimiento, Batería, LED de estado...). Se aplica al añadir una cámara; puede renombrarlas en Gladys cuando quiera.",
+        "de": "Sprache der erstellten Funktionsnamen (Bewegung, Batterie, Status-LED...). Wird beim Hinzufügen einer Kamera angewendet; jederzeit in Gladys umbenennbar."
+      },
+      "default": "en",
+      "options": [
+        {
+          "value": "en",
+          "label": { "en": "English", "fr": "English", "es": "English", "de": "English" }
+        },
+        {
+          "value": "fr",
+          "label": { "en": "Français", "fr": "Français", "es": "Français", "de": "Français" }
+        },
+        {
+          "value": "es",
+          "label": { "en": "Español", "fr": "Español", "es": "Español", "de": "Español" }
+        },
+        {
+          "value": "de",
+          "label": { "en": "Deutsch", "fr": "Deutsch", "es": "Deutsch", "de": "Deutsch" }
+        }
+      ]
     }
   ],
   "actions": [

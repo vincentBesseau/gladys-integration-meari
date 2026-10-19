@@ -63,6 +63,21 @@ test('publishes one device per camera, accepted by Gladys', async () => {
   assert.ok(!garden.features.some((f) => f.category === 'doorbell'), 'no doorbell on a camera');
 });
 
+test('device feature names follow the configured device_language', async () => {
+  const { gladys, runtime } = setup({ iot: { DOORBELL01: { 106: 1, 150: 1 } } });
+  await runtime.applyConfig({ ...CONFIG, device_language: 'fr' });
+  const doorbell = gladys.fake.discoveredDevices.find((d) => d.name === 'Porte');
+  const nameByKey = Object.fromEntries(
+    doorbell.features.map((f) => [f.external_id.split(':').pop(), f.name]),
+  );
+  assert.equal(nameByKey.motion, 'Mouvement');
+  assert.equal(nameByKey.doorbell, 'Sonnette');
+  assert.equal(nameByKey.battery, 'Batterie');
+  assert.equal(nameByKey['motion-detection'], 'Détection de mouvement');
+  // The cloud device name itself is not translated.
+  assert.equal(doorbell.name, 'Porte');
+});
+
 test('every feature declares min and max (Gladys refuses null ones)', async () => {
   const { gladys, runtime } = setup({ iot: { DOORBELL01: { 106: 1, 108: 0, 150: 1, 103: 1 } } });
   await runtime.applyConfig({ ...CONFIG, force_doorbell: true });
