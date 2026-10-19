@@ -307,6 +307,10 @@ export class MeariClient {
   }
 
   signParams(params) {
+    if (!this.userToken) {
+      // A clean, catchable error instead of a raw crypto "key ... Received null".
+      throw new MeariAuthError('Not authenticated: no user token');
+    }
     const content = Object.keys(params)
       .sort()
       .map((k) => `${k}=${params[k]}`)
@@ -400,14 +404,34 @@ export class MeariClient {
   // --- login flow ------------------------------------------------------------
 
   async login() {
+    // The login request itself must be signed with the app key, not a stale
+    // user token, so the token is cleared for the handshake. But a re-login that
+    // then fails (network blip, one-session-per-account contention) must not
+    // leave the client token-less: the next signed poll/refresh would crash with
+    // `hmac key ... Received null`. Keep the previous session and restore it on
+    // failure, so the old token keeps working until it genuinely expires.
+    const prevToken = this.userToken;
+    const prevUserId = this.userId;
     this.userToken = null;
     this.userId = null;
     this.loggedIn = false;
-    await this.#redirect();
-    await this.#doLogin();
-    await this.#platformInit();
-    await this.refreshDevices();
-    this.loggedIn = true;
+    try {
+      await this.#redirect();
+      await this.#doLogin();
+      await this.#platformInit();
+      await this.refreshDevices();
+      this.loggedIn = true;
+    } catch (err) {
+      // #doLogin sets a fresh token on success, so a non-null token here means a
+      // later step failed: keep the new token. Only restore when we never got
+      // one (redirect/doLogin failed).
+      if (this.userToken === null && prevToken) {
+        this.userToken = prevToken;
+        this.userId = prevUserId;
+        this.loggedIn = true;
+      }
+      throw err;
+    }
   }
 
   async #redirect() {

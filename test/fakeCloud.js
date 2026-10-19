@@ -56,6 +56,9 @@ export function createFakeCloud({
   })();
 
   async function fetchImpl(url, init = {}) {
+    if (state.networkDown) {
+      throw new TypeError('fetch failed');
+    }
     const u = new URL(url);
     const params = Object.fromEntries(
       init.method === 'POST' ? new URLSearchParams(init.body) : u.searchParams,

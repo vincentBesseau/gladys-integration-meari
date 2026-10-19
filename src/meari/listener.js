@@ -21,6 +21,11 @@ const logger = createLogger({ name: 'meari-events' });
 
 export const POLL_INTERVAL_MS = 15_000;
 const POLL_ERROR_INTERVAL_MS = 60_000;
+// Re-login is costly: it opens a fresh cloud session that evicts our own MQTT
+// push (the broker pins the client id to the account user id), so a single
+// transient poll failure must not trigger one. Only re-authenticate once the
+// push is also down and polls keep failing — a likely real session expiry.
+export const RELOGIN_AFTER_FAILURES = 3;
 // An alarm seen by MQTT shows up in the event log up to one poll later.
 export const MERGE_WINDOW_MS = 45_000;
 const SEEN_CAP = 4000;
@@ -62,6 +67,7 @@ export class AlarmListener {
     this.mqtt = null;
     this.stopped = true;
     this.mqttConnected = false;
+    this.pollFailures = 0;
   }
 
   start() {
@@ -145,13 +151,29 @@ export class AlarmListener {
       let next = POLL_INTERVAL_MS;
       try {
         await this.pollOnce();
+        this.pollFailures = 0;
       } catch (err) {
-        logger.warn(`Alarm poll failed: ${err.message}`);
-        next = (await this.#relogin()) ? POLL_INTERVAL_MS : POLL_ERROR_INTERVAL_MS;
+        await this.handlePollFailure(err);
+        next = POLL_ERROR_INTERVAL_MS;
       }
       this.#schedulePoll(next);
     }, delayMs);
     this.timer.unref?.();
+  }
+
+  /**
+   * One poll failed. Decide whether to re-authenticate. While the push is
+   * connected the session is proven valid, so the failure is a network blip:
+   * retry, never re-login (a re-login opens a new cloud session that evicts our
+   * own push, dropping real-time delivery). Re-authenticate only once the push
+   * is down too and failures persist — the signature of a real session expiry.
+   */
+  async handlePollFailure(err) {
+    this.pollFailures += 1;
+    logger.warn(`Alarm poll failed: ${err.message}`);
+    if (!this.mqttConnected && this.pollFailures >= RELOGIN_AFTER_FAILURES) {
+      if (await this.#relogin()) this.pollFailures = 0;
+    }
   }
 
   async #relogin() {

@@ -64,6 +64,30 @@ test('a transient empty device refresh keeps the known cameras', async () => {
   );
 });
 
+test('a failed re-login keeps the previous session usable (no null-token crash)', async () => {
+  const cloud = createFakeCloud();
+  const client = newClient(cloud);
+  await client.login();
+  const token = client.userToken;
+  assert.ok(token);
+  // Re-login during a network outage: it throws, but must not wipe the token.
+  cloud.state.networkDown = true;
+  await assert.rejects(client.login(), /fetch failed/);
+  assert.equal(client.userToken, token, 'token preserved after a failed re-login');
+  // The real symptom: signing a request no longer crashes with "key ... null".
+  assert.doesNotThrow(() => client.signParams({ a: '1' }));
+  // The cloud recovers: a fresh login still works.
+  cloud.state.networkDown = false;
+  await client.login();
+  assert.ok(client.userToken);
+});
+
+test('signing without any token raises a clean auth error, not a crypto crash', () => {
+  const cloud = createFakeCloud();
+  const client = newClient(cloud);
+  assert.throws(() => client.signParams({ a: '1' }), MeariAuthError);
+});
+
 test('reads battery, reads and writes IoT settings through the OpenAPI', async () => {
   const cloud = createFakeCloud({
     battery: { XXXXDOORBELL01: { 154: { value: 87 }, 156: 0 } },

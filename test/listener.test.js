@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { MeariClient } from '../src/meari/client.js';
-import { AlarmListener, MERGE_WINDOW_MS } from '../src/meari/listener.js';
+import { AlarmListener, MERGE_WINDOW_MS, RELOGIN_AFTER_FAILURES } from '../src/meari/listener.js';
 import { createFakeCloud } from './fakeCloud.js';
 
 async function setup(events = {}) {
@@ -110,4 +110,37 @@ test('the second copy of a press is forwarded only when it brings a picture', as
     [false, ''],
     [true, 'https://x/p.jpgx3'],
   ]);
+});
+
+function failureListener() {
+  let logins = 0;
+  const client = {
+    login: async () => {
+      logins += 1;
+    },
+    cameras: () => [],
+  };
+  const listener = new AlarmListener({ client, useMqtt: false, onAlarm: () => {} });
+  return { listener, logins: () => logins };
+}
+
+test('a poll failure never re-logs in while the push is connected', async () => {
+  const { listener, logins } = failureListener();
+  listener.mqttConnected = true;
+  for (let i = 0; i < RELOGIN_AFTER_FAILURES + 2; i++) {
+    await listener.handlePollFailure(new Error('fetch failed'));
+  }
+  assert.equal(logins(), 0, 'push proves the session valid: a re-login would evict it');
+});
+
+test('persistent poll failures with the push down trigger one re-login', async () => {
+  const { listener, logins } = failureListener();
+  listener.mqttConnected = false;
+  for (let i = 1; i < RELOGIN_AFTER_FAILURES; i++) {
+    await listener.handlePollFailure(new Error('fetch failed'));
+    assert.equal(logins(), 0, 'no re-login before the threshold');
+  }
+  await listener.handlePollFailure(new Error('fetch failed'));
+  assert.equal(logins(), 1, 're-login once failures persist');
+  assert.equal(listener.pollFailures, 0, 'counter reset after a successful re-login');
 });
