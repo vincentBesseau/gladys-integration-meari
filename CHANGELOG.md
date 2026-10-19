@@ -6,6 +6,7 @@
 
 - The "Meari camera" widget now shows cameras only, never a doorbell (doorbells have their own "Doorbell presses" widget).
 - "Doorbell presses" items are now tappable: a press opens the core detail panel where its picture is shown enlarged.
+- Spanish (es) and German (de) added: every user-facing string (manifest config, widgets, action messages, scene triggers) is now provided in the four languages Gladys supports (en/fr/es/de) and resolved from the UI language, English as the fallback. Device feature names remain single, user-renamable labels (a Gladys limitation, not multi-language).
 
 ### Added
 

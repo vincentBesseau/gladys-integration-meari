@@ -48,14 +48,20 @@ function dayString(t) {
 const NOT_CONFIGURED = {
   en: 'Enter the e-mail and password of your camera app account.',
   fr: 'Renseignez l’e-mail et le mot de passe du compte de votre application caméra.',
+  es: 'Introduzca el correo y la contraseña de la cuenta de su aplicación de cámara.',
+  de: 'Geben Sie E-Mail und Passwort des Kontos Ihrer Kamera-App ein.',
 };
 const AUTH_FAILED = {
   en: 'Login refused: check the e-mail, the password and the app (profile).',
   fr: 'Connexion refusée : vérifiez l’e-mail, le mot de passe et l’application (profil).',
+  es: 'Inicio de sesión rechazado: compruebe el correo, la contraseña y la aplicación (perfil).',
+  de: 'Anmeldung abgelehnt: Prüfen Sie E-Mail, Passwort und App (Profil).',
 };
 const CLOUD_UNREACHABLE = {
   en: 'The Meari cloud could not be reached, retrying in one minute.',
   fr: 'Le cloud Meari est injoignable, nouvelle tentative dans une minute.',
+  es: 'No se pudo contactar con la nube Meari, se reintentará en un minuto.',
+  de: 'Die Meari-Cloud war nicht erreichbar, neuer Versuch in einer Minute.',
 };
 
 export class Runtime {
@@ -544,13 +550,21 @@ export class Runtime {
     } catch (err) {
       return err instanceof MeariAuthError
         ? AUTH_FAILED
-        : { en: `Cloud unreachable: ${err.message}`, fr: `Cloud injoignable : ${err.message}` };
+        : {
+            en: `Cloud unreachable: ${err.message}`,
+            fr: `Cloud injoignable : ${err.message}`,
+            es: `Nube inaccesible: ${err.message}`,
+            de: `Cloud nicht erreichbar: ${err.message}`,
+          };
     }
     const cameras = client.cameras();
     const names = cameras.map((c) => c.deviceName || c.snNum).join(', ');
+    const suffix = names ? ` (${names})` : '';
     return {
-      en: `Connected: ${cameras.length} camera(s) found${names ? ` (${names})` : ''}.`,
-      fr: `Connecté : ${cameras.length} caméra(s) trouvée(s)${names ? ` (${names})` : ''}.`,
+      en: `Connected: ${cameras.length} camera(s) found${suffix}.`,
+      fr: `Connecté : ${cameras.length} caméra(s) trouvée(s)${suffix}.`,
+      es: `Conectado: ${cameras.length} cámara(s) encontrada(s)${suffix}.`,
+      de: `Verbunden: ${cameras.length} Kamera(s) gefunden${suffix}.`,
     };
   }
 }

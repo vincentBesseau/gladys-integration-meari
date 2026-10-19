@@ -24,13 +24,28 @@ export const WIDGET_KEYS = {
 export const HISTORY_SIZE = 5;
 
 const SOURCE_LABELS = {
-  doorbell: { en: 'doorbell press', fr: 'appui sonnette' },
-  motion: { en: 'motion', fr: 'mouvement' },
-  history: { en: 'last alert', fr: 'dernière alerte' },
-  cloud: { en: 'cloud thumbnail', fr: 'vignette du cloud' },
+  doorbell: {
+    en: 'doorbell press',
+    fr: 'appui sonnette',
+    es: 'pulsación del timbre',
+    de: 'Klingeln',
+  },
+  motion: { en: 'motion', fr: 'mouvement', es: 'movimiento', de: 'Bewegung' },
+  history: { en: 'last alert', fr: 'dernière alerte', es: 'última alerta', de: 'letzter Alarm' },
+  cloud: {
+    en: 'cloud thumbnail',
+    fr: 'vignette du cloud',
+    es: 'miniatura de la nube',
+    de: 'Cloud-Vorschaubild',
+  },
 };
 
-const PRESS_LABEL = { en: 'Doorbell press', fr: 'Appui sonnette' };
+const PRESS_LABEL = {
+  en: 'Doorbell press',
+  fr: 'Appui sonnette',
+  es: 'Pulsación del timbre',
+  de: 'Klingeln',
+};
 
 function timeZone() {
   return process.env.TZ || undefined;
@@ -59,9 +74,11 @@ export function formatDay(at, language, now = Date.now()) {
       month: '2-digit',
       day: '2-digit',
     }).format(new Date(t));
-  const fr = String(language).startsWith('fr');
-  if (dayKey(at) === dayKey(now)) return fr ? 'Aujourd’hui' : 'Today';
-  if (dayKey(at) === dayKey(now - 86_400_000)) return fr ? 'Hier' : 'Yesterday';
+  const lang = String(language || 'en').slice(0, 2);
+  const TODAY = { en: 'Today', fr: 'Aujourd’hui', es: 'Hoy', de: 'Heute' };
+  const YESTERDAY = { en: 'Yesterday', fr: 'Hier', es: 'Ayer', de: 'Gestern' };
+  if (dayKey(at) === dayKey(now)) return tr(TODAY, lang);
+  if (dayKey(at) === dayKey(now - 86_400_000)) return tr(YESTERDAY, lang);
   const text = new Intl.DateTimeFormat(language || 'en', {
     weekday: 'long',
     day: 'numeric',
@@ -74,12 +91,32 @@ export function formatDay(at, language, now = Date.now()) {
 /** "3 min ago" style age, multi-language. */
 export function formatAge(at, now = Date.now()) {
   const minutes = Math.max(0, Math.round((now - at) / 60_000));
-  if (minutes < 1) return { en: 'just now', fr: 'à l’instant' };
-  if (minutes < 60) return { en: `${minutes} min ago`, fr: `il y a ${minutes} min` };
+  if (minutes < 1)
+    return { en: 'just now', fr: 'à l’instant', es: 'ahora mismo', de: 'gerade eben' };
+  if (minutes < 60) {
+    return {
+      en: `${minutes} min ago`,
+      fr: `il y a ${minutes} min`,
+      es: `hace ${minutes} min`,
+      de: `vor ${minutes} Min`,
+    };
+  }
   const hours = Math.round(minutes / 60);
-  if (hours < 48) return { en: `${hours} h ago`, fr: `il y a ${hours} h` };
+  if (hours < 48) {
+    return {
+      en: `${hours} h ago`,
+      fr: `il y a ${hours} h`,
+      es: `hace ${hours} h`,
+      de: `vor ${hours} Std`,
+    };
+  }
   const days = Math.round(hours / 24);
-  return { en: `${days} days ago`, fr: `il y a ${days} jours` };
+  return {
+    en: `${days} days ago`,
+    fr: `il y a ${days} jours`,
+    es: `hace ${days} días`,
+    de: `vor ${days} Tagen`,
+  };
 }
 
 /**
@@ -119,6 +156,8 @@ export const WIDGETS = {
         return emptyState({
           en: 'No camera available (doorbells have their own widget).',
           fr: 'Aucune caméra disponible (les sonnettes ont leur propre widget).',
+          es: 'No hay cámara disponible (los timbres tienen su propio widget).',
+          de: 'Keine Kamera verfügbar (Türklingeln haben ein eigenes Widget).',
         });
       }
       const ids = cameraIds(runtime.gladys, camera);
@@ -138,20 +177,22 @@ export const WIDGETS = {
           text: {
             en: 'No picture yet: it comes with the next alert or doorbell press.',
             fr: 'Pas encore d’image : elle viendra avec la prochaine alerte ou le prochain appui.',
+            es: 'Aún no hay imagen: llegará con la próxima alerta o pulsación del timbre.',
+            de: 'Noch kein Bild: Es kommt mit dem nächsten Alarm oder Klingeln.',
           },
         });
       }
       if (isBatteryCamera(camera)) {
         components.push({
           type: 'value',
-          label: { en: 'Battery', fr: 'Batterie' },
+          label: { en: 'Battery', fr: 'Batterie', es: 'Batería', de: 'Batterie' },
           icon: 'battery',
           device_feature: ids.feature(FEATURE.BATTERY),
         });
       }
       components.push({
         type: 'value',
-        label: { en: 'Motion', fr: 'Mouvement' },
+        label: { en: 'Motion', fr: 'Mouvement', es: 'Movimiento', de: 'Bewegung' },
         icon: 'activity',
         device_feature: ids.feature(FEATURE.MOTION),
       });
@@ -162,9 +203,14 @@ export const WIDGETS = {
           type: 'status',
           items: [
             {
-              label: { en: 'Picture', fr: 'Image' },
+              label: { en: 'Picture', fr: 'Image', es: 'Imagen', de: 'Bild' },
               icon: 'clock',
-              value: { en: `${age.en} (${source.en})`, fr: `${age.fr} (${source.fr})` },
+              value: {
+                en: `${age.en} (${source.en})`,
+                fr: `${age.fr} (${source.fr})`,
+                es: `${age.es} (${source.es})`,
+                de: `${age.de} (${source.de})`,
+              },
               color:
                 Date.now() - snapshot.at < 10 * 60_000
                   ? WIDGET_COLORS.SUCCESS
@@ -175,7 +221,12 @@ export const WIDGETS = {
       }
       components.push({
         type: 'button',
-        label: { en: 'Check for a new picture', fr: 'Chercher une image' },
+        label: {
+          en: 'Check for a new picture',
+          fr: 'Chercher une image',
+          es: 'Buscar una imagen nueva',
+          de: 'Nach neuem Bild suchen',
+        },
         icon: 'refresh-cw',
         style: 'secondary',
         action: { key: 'refresh', params: { device: ids.device } },
@@ -189,10 +240,17 @@ export const WIDGETS = {
       if (actionKey !== 'refresh') return undefined;
       const found = await runtime.refreshSnapshot(params.device);
       return found
-        ? { en: 'New picture loaded.', fr: 'Nouvelle image chargée.' }
+        ? {
+            en: 'New picture loaded.',
+            fr: 'Nouvelle image chargée.',
+            es: 'Nueva imagen cargada.',
+            de: 'Neues Bild geladen.',
+          }
         : {
             en: 'No newer picture in the cloud (the camera sleeps between alerts).',
             fr: 'Pas d’image plus récente dans le cloud (la caméra dort entre deux alertes).',
+            es: 'No hay imagen más reciente en la nube (la cámara duerme entre alertas).',
+            de: 'Kein neueres Bild in der Cloud (die Kamera schläft zwischen Alarmen).',
           };
     },
   },
@@ -201,13 +259,20 @@ export const WIDGETS = {
     get(runtime, { settings, language }) {
       const camera = settings?.device ? pickCamera(runtime, settings) : null;
       if (settings?.device && !camera) {
-        return emptyState({ en: 'Camera not found.', fr: 'Caméra introuvable.' });
+        return emptyState({
+          en: 'Camera not found.',
+          fr: 'Caméra introuvable.',
+          es: 'Cámara no encontrada.',
+          de: 'Kamera nicht gefunden.',
+        });
       }
       const presses = runtime.history.latest(HISTORY_SIZE, camera ? String(camera.deviceID) : null);
       if (presses.length === 0) {
         return emptyState({
           en: 'No doorbell press yet.',
           fr: 'Aucun appui sur la sonnette pour le moment.',
+          es: 'Aún no hay pulsaciones del timbre.',
+          de: 'Noch kein Klingeln.',
         });
       }
       const several = !camera && new Set(presses.map((p) => p.deviceId)).size > 1;
