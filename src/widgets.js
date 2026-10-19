@@ -14,6 +14,7 @@
 
 import { WIDGET_COLORS } from '@gladysassistant/integration-sdk';
 import { FEATURE, cameraIds, isBatteryCamera } from './camera.js';
+import { isDoorbellDevice } from './meari/client.js';
 
 export const WIDGET_KEYS = {
   CAMERA: 'camera_view',
@@ -29,8 +30,16 @@ const SOURCE_LABELS = {
   cloud: { en: 'cloud thumbnail', fr: 'vignette du cloud' },
 };
 
+const PRESS_LABEL = { en: 'Doorbell press', fr: 'Appui sonnette' };
+
 function timeZone() {
   return process.env.TZ || undefined;
+}
+
+/** Resolve a multi-language object to one string, English as the fallback. */
+export function tr(dict, language) {
+  if (!dict || typeof dict !== 'object') return dict ?? '';
+  return dict[language] ?? dict.en ?? '';
 }
 
 export function formatTime(at, language) {
@@ -77,8 +86,17 @@ export function formatAge(at, now = Date.now()) {
  * Pick the camera a widget instance shows: the one chosen in its settings, or
  * by default the first doorbell, or the first camera.
  */
-export function pickCamera(runtime, settings, { preferDoorbell = false } = {}) {
-  const cameras = runtime.cameras();
+export function pickCamera(
+  runtime,
+  settings,
+  { preferDoorbell = false, excludeDoorbells = false } = {},
+) {
+  let cameras = runtime.cameras();
+  // The "Meari camera" widget is for standalone cameras: a doorbell has its own
+  // widget ("Doorbell presses"), so it is excluded here by its cloud category
+  // (not hasDoorbell, which the force_doorbell option would make true on every
+  // camera).
+  if (excludeDoorbells) cameras = cameras.filter((c) => !isDoorbellDevice(c));
   if (settings?.device) {
     return cameras.find((c) => cameraIds(runtime.gladys, c).device === settings.device) ?? null;
   }
@@ -96,11 +114,11 @@ function emptyState(text) {
 export const WIDGETS = {
   [WIDGET_KEYS.CAMERA]: {
     get(runtime, { settings }) {
-      const camera = pickCamera(runtime, settings, { preferDoorbell: true });
+      const camera = pickCamera(runtime, settings, { excludeDoorbells: true });
       if (!camera) {
         return emptyState({
-          en: 'No camera available yet.',
-          fr: 'Aucune caméra disponible pour le moment.',
+          en: 'No camera available (doorbells have their own widget).',
+          fr: 'Aucune caméra disponible (les sonnettes ont leur propre widget).',
         });
       }
       const ids = cameraIds(runtime.gladys, camera);
@@ -203,13 +221,19 @@ export const WIDGETS = {
             type: 'card-list',
             display: 'list',
             items: presses.map((press) => {
+              const name = names.get(press.deviceId) ?? '';
               const item = {
                 title: formatTime(press.at, language),
                 subtitle: several
-                  ? `${formatDay(press.at, language)} · ${names.get(press.deviceId) ?? ''}`
+                  ? `${formatDay(press.at, language)} · ${name}`
                   : formatDay(press.at, language),
                 date: new Date(press.at).toISOString(),
               };
+              // A description makes the item tappable: the core then opens its
+              // detail panel, where the press picture is shown enlarged.
+              item.description =
+                `${tr(PRESS_LABEL, language)} — ${formatDay(press.at, language)}, ${formatTime(press.at, language)}` +
+                (name ? ` · ${name}` : '');
               if (press.imageKey) item.image = press.imageKey;
               return item;
             }),

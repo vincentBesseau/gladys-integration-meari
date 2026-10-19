@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The "Meari camera" widget now shows cameras only, never a doorbell (doorbells have their own "Doorbell presses" widget).
+- "Doorbell presses" items are now tappable: a press opens the core detail panel where its picture is shown enlarged.
+
 ### Added
 
 - Login with an account of any Meari app (ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam), camera discovery.
