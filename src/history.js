@@ -34,7 +34,8 @@ export class DoorbellHistory {
       const raw = JSON.parse(readFileSync(join(this.dir, 'doorbell-history.json'), 'utf8'));
       this.entries = Array.isArray(raw.entries) ? raw.entries : [];
     } catch (err) {
-      if (err.code !== 'ENOENT') logger.warn(`History not readable, starting empty: ${err.message}`);
+      if (err.code !== 'ENOENT')
+        logger.warn(`History not readable, starting empty: ${err.message}`);
     }
   }
 
@@ -85,8 +86,7 @@ export class DoorbellHistory {
   add({ id, deviceId, at, image = null }) {
     const existing = this.entries.find(
       (e) =>
-        e.deviceId === deviceId &&
-        ((id && e.id === id) || Math.abs(e.at - at) < SAME_PRESS_MS),
+        e.deviceId === deviceId && ((id && e.id === id) || Math.abs(e.at - at) < SAME_PRESS_MS),
     );
     if (existing) {
       if (image && !existing.imageKey) {
@@ -117,7 +117,10 @@ export class DoorbellHistory {
   }
 
   #keyFor(entry) {
-    return `ring-${entry.deviceId}-${entry.at}`.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 64);
+    return `ring-${entry.deviceId}-${entry.at}`
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '')
+      .slice(0, 64);
   }
 
   #prune(deviceId) {

@@ -44,9 +44,12 @@ export function formatTime(at, language) {
 export function formatDay(at, language, now = Date.now()) {
   const tz = timeZone();
   const dayKey = (t) =>
-    new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
-      new Date(t),
-    );
+    new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date(t));
   const fr = String(language).startsWith('fr');
   if (dayKey(at) === dayKey(now)) return fr ? 'Aujourd’hui' : 'Today';
   if (dayKey(at) === dayKey(now - 86_400_000)) return fr ? 'Hier' : 'Yesterday';
@@ -95,7 +98,10 @@ export const WIDGETS = {
     get(runtime, { settings }) {
       const camera = pickCamera(runtime, settings, { preferDoorbell: true });
       if (!camera) {
-        return emptyState({ en: 'No camera available yet.', fr: 'Aucune caméra disponible pour le moment.' });
+        return emptyState({
+          en: 'No camera available yet.',
+          fr: 'Aucune caméra disponible pour le moment.',
+        });
       }
       const ids = cameraIds(runtime.gladys, camera);
       const snapshot = runtime.snapshotInfo(camera);
@@ -141,7 +147,10 @@ export const WIDGETS = {
               label: { en: 'Picture', fr: 'Image' },
               icon: 'clock',
               value: { en: `${age.en} (${source.en})`, fr: `${age.fr} (${source.fr})` },
-              color: Date.now() - snapshot.at < 10 * 60_000 ? WIDGET_COLORS.SUCCESS : WIDGET_COLORS.NEUTRAL,
+              color:
+                Date.now() - snapshot.at < 10 * 60_000
+                  ? WIDGET_COLORS.SUCCESS
+                  : WIDGET_COLORS.NEUTRAL,
             },
           ],
         });
@@ -178,10 +187,15 @@ export const WIDGETS = {
       }
       const presses = runtime.history.latest(HISTORY_SIZE, camera ? String(camera.deviceID) : null);
       if (presses.length === 0) {
-        return emptyState({ en: 'No doorbell press yet.', fr: 'Aucun appui sur la sonnette pour le moment.' });
+        return emptyState({
+          en: 'No doorbell press yet.',
+          fr: 'Aucun appui sur la sonnette pour le moment.',
+        });
       }
       const several = !camera && new Set(presses.map((p) => p.deviceId)).size > 1;
-      const names = new Map(runtime.cameras().map((c) => [String(c.deviceID), c.deviceName || c.snNum]));
+      const names = new Map(
+        runtime.cameras().map((c) => [String(c.deviceID), c.deviceName || c.snNum]),
+      );
       return {
         ttl_seconds: 600,
         components: [

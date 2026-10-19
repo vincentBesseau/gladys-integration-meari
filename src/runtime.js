@@ -238,7 +238,12 @@ export class Runtime {
     const ids = cameraIds(this.gladys, camera);
     const fitted = image ? this.#fit(image) : null;
     if (fitted) {
-      await this.#setSnapshot(camera, fitted, event.kind === 'doorbell' ? 'doorbell' : 'motion', Date.now());
+      await this.#setSnapshot(
+        camera,
+        fitted,
+        event.kind === 'doorbell' ? 'doorbell' : 'motion',
+        Date.now(),
+      );
     }
     if (event.kind === 'doorbell') {
       const changed = this.history.add({
@@ -339,7 +344,9 @@ export class Runtime {
       ...fitted,
       at,
       source,
-      key: `cam-${key}-${Date.now().toString(36)}-${this.snapshotGeneration}`.toLowerCase().slice(0, 64),
+      key: `cam-${key}-${Date.now().toString(36)}-${this.snapshotGeneration}`
+        .toLowerCase()
+        .slice(0, 64),
     });
     this.#refreshWidget(WIDGET_KEYS.CAMERA);
     const now = Date.now();
@@ -412,7 +419,10 @@ export class Runtime {
         if (presses >= HISTORY_SIZE && pictureDone) break;
         let entries;
         try {
-          entries = await client.getDeviceEvents(camera.deviceID, dayString(Date.now() - back * 86_400_000));
+          entries = await client.getDeviceEvents(
+            camera.deviceID,
+            dayString(Date.now() - back * 86_400_000),
+          );
         } catch (err) {
           logger.debug(`Event log read failed: ${err.message}`);
           break;
@@ -427,7 +437,11 @@ export class Runtime {
               pictureDone = true;
             }
           }
-          if (presses < HISTORY_SIZE && at !== null && classifyAlarm(Number(entry.eventType)) === 'doorbell') {
+          if (
+            presses < HISTORY_SIZE &&
+            at !== null &&
+            classifyAlarm(Number(entry.eventType)) === 'doorbell'
+          ) {
             presses += 1;
             const fitted = await this.#downloadEventImage(camera, entry);
             historyChanged =
@@ -478,7 +492,9 @@ export class Runtime {
 
     const states = [];
     try {
-      states.push(...batteryStates(this.gladys, camera, await this.client.getBatteryInfo(camera.snNum)));
+      states.push(
+        ...batteryStates(this.gladys, camera, await this.client.getBatteryInfo(camera.snNum)),
+      );
     } catch (err) {
       logger.debug(`Battery read failed: ${err.message}`);
     }

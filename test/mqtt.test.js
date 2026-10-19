@@ -96,7 +96,13 @@ test('subscriber connects, subscribes and acknowledges QoS 1 and 2 messages', ()
 
 test('a refused CONNACK is reported with its reason', () => {
   const socket = new FakeSocket();
-  const sub = new MqttSubscriber({ host: 'h', port: 1, clientId: '1', topics: ['t'], connect: () => socket });
+  const sub = new MqttSubscriber({
+    host: 'h',
+    port: 1,
+    clientId: '1',
+    topics: ['t'],
+    connect: () => socket,
+  });
   let reason = null;
   sub.on('connack-refused', (r) => {
     reason = r;

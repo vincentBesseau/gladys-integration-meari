@@ -2,14 +2,14 @@
 
 **Meari** is the cloud platform behind many brands of Wi-Fi cameras and doorbells, often battery powered. If your camera is controlled with one of these apps, this integration is for you:
 
-| App | Common brands |
-|---|---|
-| ieGeek Cam | ieGeek |
-| CloudEdge | cameras sold under many brands |
-| CloudPlus / CloudHome | same |
-| ANRAN | ANRAN |
-| Arenti | Arenti |
-| BoifunCam | Boifun |
+| App                   | Common brands                  |
+| --------------------- | ------------------------------ |
+| ieGeek Cam            | ieGeek                         |
+| CloudEdge             | cameras sold under many brands |
+| CloudPlus / CloudHome | same                           |
+| ANRAN                 | ANRAN                          |
+| Arenti                | Arenti                         |
+| BoifunCam             | Boifun                         |
 
 These cameras expose neither RTSP nor ONVIF: the integration goes through the Meari cloud, like the app does.
 

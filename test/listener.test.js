@@ -20,11 +20,16 @@ async function setup(events = {}) {
 }
 
 test('the first poll seeds existing events without replaying them', async () => {
-  const { listener, alarms, cloud, advance } = await setup({ 1001: [{ msgID: 'old', eventType: 3 }] });
+  const { listener, alarms, cloud, advance } = await setup({
+    1001: [{ msgID: 'old', eventType: 3 }],
+  });
   await listener.pollOnce();
   assert.deepEqual(alarms, []);
 
-  cloud.state.events[1001] = [{ msgID: 'new', eventType: 3 }, { msgID: 'old', eventType: 3 }];
+  cloud.state.events[1001] = [
+    { msgID: 'new', eventType: 3 },
+    { msgID: 'old', eventType: 3 },
+  ];
   advance(15_000);
   await listener.pollOnce();
   assert.deepEqual(alarms, [[1001, 'doorbell', 'poll']]);
@@ -33,7 +38,10 @@ test('the first poll seeds existing events without replaying them', async () => 
 test('an alarm pushed then polled is dispatched once', async () => {
   const { listener, alarms, cloud, advance } = await setup();
   await listener.pollOnce();
-  assert.equal(await listener.handlePayload({ deviceID: '1001', eventType: 3, msgID: 'p1' }, 'push'), true);
+  assert.equal(
+    await listener.handlePayload({ deviceID: '1001', eventType: 3, msgID: 'p1' }, 'push'),
+    true,
+  );
   cloud.state.events[1001] = [{ msgID: 'p1', eventType: 3 }];
   advance(10_000);
   await listener.pollOnce();
@@ -59,7 +67,10 @@ test('alarms of unknown cameras or unknown types are ignored', async () => {
   assert.equal(await listener.handlePayload({ deviceID: '999', eventType: 2 }, 'push'), false);
   assert.equal(await listener.handlePayload({ deviceID: '1001', eventType: 21 }, 'push'), false);
   // Routed by serial when the payload has no device id.
-  assert.equal(await listener.handlePayload({ snNum: 'XXXXGARDEN0002', alarmType: 20 }, 'push'), true);
+  assert.equal(
+    await listener.handlePayload({ snNum: 'XXXXGARDEN0002', alarmType: 20 }, 'push'),
+    true,
+  );
   assert.deepEqual(alarms, [[1002, 'motion', 'push']]);
 });
 
@@ -91,7 +102,10 @@ test('the second copy of a press is forwarded only when it brings a picture', as
   listener.onAlarm = (_camera, event) => seen.push([event.repeat, event.imageUrl]);
   await listener.handlePayload({ deviceID: '1001', eventType: 3 }, 'push');
   await listener.handlePayload({ deviceID: '1001', eventType: 3, msgID: 'a' }, 'poll');
-  await listener.handlePayload({ deviceID: '1001', eventType: 3, msgID: 'a', imageUrl: 'https://x/p.jpgx3' }, 'poll');
+  await listener.handlePayload(
+    { deviceID: '1001', eventType: 3, msgID: 'a', imageUrl: 'https://x/p.jpgx3' },
+    'poll',
+  );
   assert.deepEqual(seen, [
     [false, ''],
     [true, 'https://x/p.jpgx3'],

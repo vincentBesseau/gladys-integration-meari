@@ -2,14 +2,14 @@
 
 **Meari** est la plateforme cloud utilisée par de nombreuses marques de caméras et sonnettes Wi-Fi, souvent sur batterie. Si votre caméra se pilote avec l'une de ces applications, cette intégration est faite pour vous :
 
-| Application | Marques courantes |
-|---|---|
-| ieGeek Cam | ieGeek |
-| CloudEdge | caméras vendues sous de nombreuses marques |
-| CloudPlus / CloudHome | idem |
-| ANRAN | ANRAN |
-| Arenti | Arenti |
-| BoifunCam | Boifun |
+| Application           | Marques courantes                          |
+| --------------------- | ------------------------------------------ |
+| ieGeek Cam            | ieGeek                                     |
+| CloudEdge             | caméras vendues sous de nombreuses marques |
+| CloudPlus / CloudHome | idem                                       |
+| ANRAN                 | ANRAN                                      |
+| Arenti                | Arenti                                     |
+| BoifunCam             | Boifun                                     |
 
 Ces caméras n'exposent ni RTSP ni ONVIF : l'intégration passe par le cloud Meari, comme l'application.
 

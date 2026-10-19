@@ -39,8 +39,13 @@ test('aesDecrypt reverses aesEncrypt, with or without base64 padding', () => {
 test('decryptPlatformSignature recovers the OpenAPI credentials', () => {
   const userId = 123456;
   const expireTime = '1760000000';
-  const key16 = Buffer.from(`${userId}81a${expireTime}`).toString('base64').replace(/=+$/, '').slice(0, 16);
-  const info = Buffer.from(JSON.stringify({ accessid: 'AID', accesskey: 'AKEY' })).toString('base64');
+  const key16 = Buffer.from(`${userId}81a${expireTime}`)
+    .toString('base64')
+    .replace(/=+$/, '')
+    .slice(0, 16);
+  const info = Buffer.from(JSON.stringify({ accessid: 'AID', accesskey: 'AKEY' })).toString(
+    'base64',
+  );
   const signature = aesEncrypt(`${info}-whatever`, key16);
   assert.deepEqual(
     decryptPlatformSignature(signature, { userId, partnerId: '81', ttid: 'a', expireTime }),
@@ -59,7 +64,9 @@ test('decodeEventSnapshot reverses the .jpgx3 XOR of the first 1024 bytes', () =
   plain[0] = 0xff;
   plain[1] = 0xd8;
   plain[2] = 0xff;
-  const key = Buffer.from(crypto.createHash('md5').update(`${sn}|${sn.length}|meari.stream`).digest('hex'));
+  const key = Buffer.from(
+    crypto.createHash('md5').update(`${sn}|${sn.length}|meari.stream`).digest('hex'),
+  );
   // Independent check of the key derivation (Python hashlib).
   assert.equal(key.toString(), '8c75db5835b81bf5eb28ca16d0fb3a67');
   const obfuscated = Buffer.from(plain);

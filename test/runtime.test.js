@@ -9,7 +9,9 @@ import { FEATURE, cameraIds } from '../src/camera.js';
 import { fitJpeg } from '../src/image.js';
 import { createFakeCloud } from './fakeCloud.js';
 
-const manifest = JSON.parse(readFileSync(new URL('../gladys-assistant-integration.json', import.meta.url)));
+const manifest = JSON.parse(
+  readFileSync(new URL('../gladys-assistant-integration.json', import.meta.url)),
+);
 const CONFIG = { email: 'v@example.com', password: 'pa$$' };
 
 function setup(cloudOptions = {}) {
@@ -48,7 +50,15 @@ test('publishes one device per camera, accepted by Gladys', async () => {
   assert.equal(devices.length, 2);
   const doorbell = devices.find((d) => d.name === 'Porte');
   const keys = doorbell.features.map((f) => f.external_id.split(':').pop());
-  assert.deepEqual(keys, ['image', 'motion', 'doorbell', 'battery', 'charging', 'motion-detection', 'pir']);
+  assert.deepEqual(keys, [
+    'image',
+    'motion',
+    'doorbell',
+    'battery',
+    'charging',
+    'motion-detection',
+    'pir',
+  ]);
   const garden = devices.find((d) => d.name === 'Jardin');
   assert.ok(!garden.features.some((f) => f.category === 'doorbell'), 'no doorbell on a camera');
 });
@@ -84,7 +94,10 @@ test('a doorbell press rings, fires the scene trigger, then resets', async (t) =
     device_feature_external_id: ids.feature(FEATURE.DOORBELL),
     state: 1,
   });
-  assert.deepEqual(gladys.fake.sceneEvents.at(-1), { key: 'doorbell_pressed', data: { device: ids.device } });
+  assert.deepEqual(gladys.fake.sceneEvents.at(-1), {
+    key: 'doorbell_pressed',
+    data: { device: ids.device },
+  });
 
   t.mock.timers.tick(5_000);
   await new Promise(setImmediate);
@@ -123,7 +136,9 @@ test('scene trigger keys and data fields are declared in the manifest', () => {
   const triggers = Object.fromEntries(manifest.scene_triggers.map((t) => [t.key, t]));
   assert.ok(triggers.doorbell_pressed);
   assert.ok(triggers.motion_detected);
-  const targets = triggers.motion_detected.fields.find((f) => f.key === 'target').options.map((o) => o.value);
+  const targets = triggers.motion_detected.fields
+    .find((f) => f.key === 'target')
+    .options.map((o) => o.value);
   assert.deepEqual(targets.sort(), ['motion', 'person']);
 });
 
@@ -167,7 +182,9 @@ test('poll reads battery and settings; switches write to the camera', async () =
   const device = { external_id: ids.device };
 
   assert.equal(await runtime.poll(device), true);
-  const byFeature = Object.fromEntries(gladys.fake.states.map((s) => [s.device_feature_external_id.split(':').pop(), s.state]));
+  const byFeature = Object.fromEntries(
+    gladys.fake.states.map((s) => [s.device_feature_external_id.split(':').pop(), s.state]),
+  );
   assert.equal(byFeature.battery, 64);
   assert.equal(byFeature.charging, 1);
   assert.equal(byFeature['motion-detection'], 1);

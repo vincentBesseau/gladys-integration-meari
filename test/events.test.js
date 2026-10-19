@@ -12,7 +12,10 @@ test('parses a flat event-log entry', () => {
 
 test('parses nested MQTT payloads (params/data wrappers) from a Buffer', () => {
   const payload = Buffer.from(
-    JSON.stringify({ event: 'alarm', params: { data: { alarmType: '20', snNum: 'SN9', deviceId: '7' } } }),
+    JSON.stringify({
+      event: 'alarm',
+      params: { data: { alarmType: '20', snNum: 'SN9', deviceId: '7' } },
+    }),
   );
   const event = parseAlarmEvent(payload);
   assert.equal(event.kind, 'motion');
@@ -22,7 +25,12 @@ test('parses nested MQTT payloads (params/data wrappers) from a Buffer', () => {
 });
 
 test('a doorbell press wins over a motion in the same payload', () => {
-  const event = parseAlarmEvent({ items: [{ eventType: 2, deviceID: 1 }, { eventType: 3, deviceID: 1 }] });
+  const event = parseAlarmEvent({
+    items: [
+      { eventType: 2, deviceID: 1 },
+      { eventType: 3, deviceID: 1 },
+    ],
+  });
   assert.equal(event.kind, 'doorbell');
   assert.equal(event.alarmName, 'Visitor');
 });
@@ -35,7 +43,11 @@ test('unknown alarm types are reported as "other", never as motion', () => {
 });
 
 test('finds the snapshot URL anywhere in the payload', () => {
-  const event = parseAlarmEvent({ eventType: 1, deviceID: 1, data: { pics: [{ imageUrl: 'https://x/y.jpgx3' }] } });
+  const event = parseAlarmEvent({
+    eventType: 1,
+    deviceID: 1,
+    data: { pics: [{ imageUrl: 'https://x/y.jpgx3' }] },
+  });
   assert.equal(event.imageUrl, 'https://x/y.jpgx3');
   assert.equal(parseAlarmEvent({ eventType: 1, imageUrl: 'ftp://nope' }).imageUrl, '');
 });

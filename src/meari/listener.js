@@ -112,7 +112,9 @@ export class AlarmListener {
     mqtt.on('close', (wasConnected) => {
       this.mqttConnected = false;
       if (wasConnected) {
-        logger.info('MQTT push disconnected (another login on the same account?), polling continues');
+        logger.info(
+          'MQTT push disconnected (another login on the same account?), polling continues',
+        );
       }
     });
     mqtt.on('connack-refused', (reason) => {

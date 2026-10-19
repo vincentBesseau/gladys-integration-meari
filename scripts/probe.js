@@ -33,7 +33,9 @@ await client.login();
 console.log(`Logged in. API ${client.apiServer}, MQTT ${client.mqttHost}:${client.mqttPort}`);
 
 for (const camera of client.cameras()) {
-  console.log(`\n${camera.deviceName} — category=${camera._category} devTypeID=${camera.devTypeID} model=${camera.deviceModel ?? '?'}`);
+  console.log(
+    `\n${camera.deviceName} — category=${camera._category} devTypeID=${camera.devTypeID} model=${camera.deviceModel ?? '?'}`,
+  );
   try {
     console.log('  battery:', await client.getBatteryInfo(camera.snNum));
   } catch (err) {

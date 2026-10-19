@@ -23,7 +23,9 @@ function makeJpeg(shade = 120) {
 
 /** The .jpgx3 obfuscation the cloud applies to battery-camera snapshots. */
 function obfuscate(buf, sn) {
-  const key = Buffer.from(crypto.createHash('md5').update(`${sn}|${sn.length}|meari.stream`).digest('hex'));
+  const key = Buffer.from(
+    crypto.createHash('md5').update(`${sn}|${sn.length}|meari.stream`).digest('hex'),
+  );
   const out = Buffer.from(buf);
   for (let i = 0; i < Math.min(1024, out.length); i += 1) out[i] ^= key[i % key.length];
   return out;
@@ -38,7 +40,8 @@ function setup(cloudOptions = {}, dataDir = null) {
   const cloud = createFakeCloud(cloudOptions);
   const gladys = createFakeGladys();
   const runtime = new Runtime(gladys, {
-    createClient: (config) => new MeariClient({ email: config.email, password: config.password, fetch: cloud.fetch }),
+    createClient: (config) =>
+      new MeariClient({ email: config.email, password: config.password, fetch: cloud.fetch }),
     createListener: () => ({ start() {}, stop() {} }),
     dataDir,
   });
@@ -49,8 +52,14 @@ function setup(cloudOptions = {}, dataDir = null) {
 test('parseEventTime understands the cloud formats', () => {
   assert.equal(parseEventTime({ eventTime: 1760000000 }), 1760000000000);
   assert.equal(parseEventTime({ eventTime: '1760000000123' }), 1760000000123);
-  assert.equal(parseEventTime({ eventTime: '20261018013500' }), new Date(2026, 9, 18, 1, 35, 0).getTime());
-  assert.equal(parseEventTime({ devLocalTime: '2026-10-18 01:35:00' }), new Date(2026, 9, 18, 1, 35, 0).getTime());
+  assert.equal(
+    parseEventTime({ eventTime: '20261018013500' }),
+    new Date(2026, 9, 18, 1, 35, 0).getTime(),
+  );
+  assert.equal(
+    parseEventTime({ devLocalTime: '2026-10-18 01:35:00' }),
+    new Date(2026, 9, 18, 1, 35, 0).getTime(),
+  );
   assert.equal(parseEventTime({ eventTime: 'garbage' }), null);
   assert.equal(parseEventTime({}), null);
 });
@@ -100,9 +109,17 @@ test('a press without picture, then its picture: history widget with image', asy
   assert.match(empty.data.content.components[0].text.fr, /Aucun appui/);
 
   await runtime.handleAlarm(doorbell, { kind: 'doorbell', eventId: '', raw: {} }, null);
-  await runtime.handleAlarm(doorbell, { kind: 'doorbell', repeat: true, eventId: 'm9', raw: {} }, makeJpeg());
+  await runtime.handleAlarm(
+    doorbell,
+    { kind: 'doorbell', repeat: true, eventId: 'm9', raw: {} },
+    makeJpeg(),
+  );
 
-  assert.equal(gladys.fake.sceneEvents.filter((e) => e.key === 'doorbell_pressed').length, 1, 'one ring');
+  assert.equal(
+    gladys.fake.sceneEvents.filter((e) => e.key === 'doorbell_pressed').length,
+    1,
+    'one ring',
+  );
   assert.ok(gladys.fake.widgetRefreshes.includes('doorbell_history'));
 
   const ack = await gladys.fake.widgetGet('doorbell_history', { language: 'fr' });
@@ -127,16 +144,31 @@ test('startup rebuilds the history and the camera picture from the cloud log', a
   const sn = 'XXXXDOORBELL01';
   const cloud = {
     events: {},
-    images: { '/img/a.jpgx3': obfuscate(makeJpeg(200), sn), '/img/b.jpgx3': obfuscate(makeJpeg(60), sn) },
+    images: {
+      '/img/a.jpgx3': obfuscate(makeJpeg(200), sn),
+      '/img/b.jpgx3': obfuscate(makeJpeg(60), sn),
+    },
   };
   const { gladys, runtime, cloud: fake } = setup(cloud);
   // The fake serves one log per device: switch it by requested day.
   const original = fake.fetch;
   const logs = {
-    [day(now)]: [{ msgID: 't1', eventType: 3, eventTime: stamp(now), imageUrl: 'https://cdn.example/img/a.jpgx3' }],
+    [day(now)]: [
+      {
+        msgID: 't1',
+        eventType: 3,
+        eventTime: stamp(now),
+        imageUrl: 'https://cdn.example/img/a.jpgx3',
+      },
+    ],
     [day(yesterday)]: [
       { msgID: 'y2', eventType: 2, eventTime: stamp(yesterday) },
-      { msgID: 'y1', eventType: 3, eventTime: stamp(new Date(yesterday.getTime() - 60_000)), imageUrl: 'https://cdn.example/img/b.jpgx3' },
+      {
+        msgID: 'y1',
+        eventType: 3,
+        eventTime: stamp(new Date(yesterday.getTime() - 60_000)),
+        imageUrl: 'https://cdn.example/img/b.jpgx3',
+      },
     ],
   };
   runtime.createClient = (config) =>
@@ -147,7 +179,9 @@ test('startup rebuilds the history and the camera picture from the cloud log', a
         const u = new URL(url);
         if (u.pathname === '/v3/app/event/list') {
           fake.state.events[u.searchParams.get('deviceID')] =
-            u.searchParams.get('deviceID') === '1001' ? (logs[u.searchParams.get('day')] ?? []) : [];
+            u.searchParams.get('deviceID') === '1001'
+              ? (logs[u.searchParams.get('day')] ?? [])
+              : [];
         }
         return original(url, init);
       },
@@ -176,7 +210,9 @@ test('startup rebuilds the history and the camera picture from the cloud log', a
 
 test('camera widget: empty state, then the refresh button finds a newer picture', async () => {
   const sn = 'XXXXGARDEN0002';
-  const { gladys, runtime, cloud } = setup({ images: { '/img/c.jpgx3': obfuscate(makeJpeg(90), sn) } });
+  const { gladys, runtime, cloud } = setup({
+    images: { '/img/c.jpgx3': obfuscate(makeJpeg(90), sn) },
+  });
   await runtime.applyConfig(CONFIG);
   const garden = runtime.cameras().find((c) => c.deviceID === 1002);
   const settings = { device: cameraIds(gladys, garden).device };
@@ -185,13 +221,28 @@ test('camera widget: empty state, then the refresh button finds a newer picture'
   assert.deepEqual(validateWidgetContent(ack.data.content), []);
   assert.ok(!ack.data.content.components.some((c) => c.type === 'image'));
 
-  const none = await gladys.fake.widgetAction('camera_view', 'refresh', { device: settings.device }, { settings });
+  const none = await gladys.fake.widgetAction(
+    'camera_view',
+    'refresh',
+    { device: settings.device },
+    { settings },
+  );
   assert.match(none.data.message.fr ?? none.data.message, /Pas d’image/);
 
   cloud.state.events[1002] = [
-    { msgID: 'c1', eventType: 20, eventTime: stamp(new Date()), imageUrl: 'https://cdn.example/img/c.jpgx3' },
+    {
+      msgID: 'c1',
+      eventType: 20,
+      eventTime: stamp(new Date()),
+      imageUrl: 'https://cdn.example/img/c.jpgx3',
+    },
   ];
-  const found = await gladys.fake.widgetAction('camera_view', 'refresh', { device: settings.device }, { settings });
+  const found = await gladys.fake.widgetAction(
+    'camera_view',
+    'refresh',
+    { device: settings.device },
+    { settings },
+  );
   assert.match(found.data.message.fr ?? found.data.message, /Nouvelle image/);
   ack = await gladys.fake.widgetGet('camera_view', { settings });
   assert.ok(ack.data.content.components.some((c) => c.type === 'image'));
