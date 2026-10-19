@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-19
+
 ### Changed
 
 - The "Meari camera" widget now shows cameras only, never a doorbell (doorbells have their own "Doorbell presses" widget).
@@ -28,3 +30,6 @@
 - The image now makes its files readable by the unprivileged `node` user: a restrictive host umask (0600 source files) made the container crash with `EACCES: permission denied, open '/app/index.js'`.
 - A failed re-login (network blip, one-session-per-account contention) no longer leaves the client without a user token: it kept the previous session so the next signed request crashed with `The "key" argument ... Received null`, which broke the widget "refresh picture" button and dropped alarms until a full re-login succeeded. Signing without a token now raises a clean auth error instead of a crypto crash.
 - Real-time push is far more stable: a transient event-log poll failure no longer triggers a full re-login, which used to open a new cloud session that evicted the integration's own MQTT push (the broker pins the client id to the account) and forced a fallback to 15 s polling. The listener now re-authenticates only when the push is also down and polls keep failing.
+
+[Unreleased]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/vincentBesseau/gladys-integration-meari/releases/tag/v1.0.0

@@ -8,8 +8,8 @@
     "es": "Cámaras y timbres Meari: apps ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam.",
     "de": "Meari-Kameras und -Türklingeln: Apps ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam."
   },
-  "version": "0.1.0",
-  "docker_image": "ghcr.io/OWNER/gladys-integration-meari:0.1.0",
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/vincentbesseau/gladys-integration-meari:1.0.0",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/vincentBesseau/gladys-integration-meari/main/assets/cover.png",
   "categories": ["security"],
