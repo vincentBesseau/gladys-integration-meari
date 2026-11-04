@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-04
+
 ### Fixed
 
 - When `/data` is not writable (Gladys running as a non-root host process cannot hand the bind-mounted volume to the integration, and the sandbox leaves no way to fix it from inside), the doorbell history now falls back to memory with a single clear warning, instead of failing — and spamming the logs — on every press and every image. History is rebuilt from the cloud at each start, so nothing user-visible is lost; it simply is not persisted to disk until `/data` belongs to uid 1000.
@@ -35,5 +37,6 @@
 - A failed re-login (network blip, one-session-per-account contention) no longer leaves the client without a user token: it kept the previous session so the next signed request crashed with `The "key" argument ... Received null`, which broke the widget "refresh picture" button and dropped alarms until a full re-login succeeded. Signing without a token now raises a clean auth error instead of a crypto crash.
 - Real-time push is far more stable: a transient event-log poll failure no longer triggers a full re-login, which used to open a new cloud session that evicted the integration's own MQTT push (the broker pins the client id to the account) and forced a fallback to 15 s polling. The listener now re-authenticates only when the push is also down and polls keep failing.
 
-[Unreleased]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/vincentBesseau/gladys-integration-meari/releases/tag/v1.0.0
