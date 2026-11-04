@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- When `/data` is not writable (Gladys running as a non-root host process cannot hand the bind-mounted volume to the integration, and the sandbox leaves no way to fix it from inside), the doorbell history now falls back to memory with a single clear warning, instead of failing — and spamming the logs — on every press and every image. History is rebuilt from the cloud at each start, so nothing user-visible is lost; it simply is not persisted to disk until `/data` belongs to uid 1000.
+
 ## [1.0.0] - 2026-10-19
 
 ### Changed

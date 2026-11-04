@@ -13,6 +13,32 @@ import { createLogger } from '@gladysassistant/integration-sdk';
 
 const logger = createLogger({ name: 'history' });
 
+/**
+ * Return `dir` when it is writable, else null (history then runs in memory and
+ * is rebuilt from the cloud at every start). Gladys bind-mounts /data and tries
+ * to hand it to uid 1000, but when Gladys itself runs as a non-root host process
+ * that chown is skipped and /data stays root-owned — and the sandbox (read-only
+ * rootfs, all capabilities dropped) leaves the integration no way to fix it. So
+ * probe once here instead of failing on every write.
+ */
+export function writableDir(dir) {
+  if (!dir) return null;
+  try {
+    mkdirSync(join(dir, 'images'), { recursive: true });
+    const probe = join(dir, '.write-test');
+    writeFileSync(probe, '');
+    rmSync(probe, { force: true });
+    return dir;
+  } catch (err) {
+    logger.warn(
+      `${dir} is not writable (${err.code}): doorbell history is kept in memory and ` +
+        `rebuilt from the cloud at each start, not persisted to disk. This happens when ` +
+        `Gladys runs as a non-root host process; to persist it, give ${dir} to uid 1000.`,
+    );
+    return null;
+  }
+}
+
 // Per camera. The widget shows 5, a few more cover a merged multi-camera view.
 export const MAX_PER_CAMERA = 10;
 // Same press seen live and in the cloud log: their times differ by a few seconds.

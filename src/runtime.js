@@ -17,7 +17,7 @@ import {
   switchStates,
   IOT_SWITCHES,
 } from './camera.js';
-import { DoorbellHistory, parseEventTime } from './history.js';
+import { DoorbellHistory, parseEventTime, writableDir } from './history.js';
 import { fitJpeg } from './image.js';
 import { MeariAuthError, MeariClient } from './meari/client.js';
 import { decodeEventSnapshot } from './meari/crypto.js';
@@ -98,7 +98,7 @@ export class Runtime {
     this.snapshotGeneration = 0;
     this.lastImagePublish = new Map();
     const dataDir = deps.dataDir !== undefined ? deps.dataDir : (process.env.DATA_DIR ?? '/data');
-    this.history = new DoorbellHistory(dataDir);
+    this.history = new DoorbellHistory(writableDir(dataDir));
     this.lastPolls = new Map();
     this.iotByCamera = new Map();
   }
