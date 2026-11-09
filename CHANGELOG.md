@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Updated `@gladysassistant/integration-sdk` to 0.16.0 (additive: music player, AI and TTS provider types) and refreshed dev dependencies and CI actions.
+
 ## [1.0.1] - 2026-11-04
 
 ### Fixed
