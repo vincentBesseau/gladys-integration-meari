@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-09
+
 ### Changed
 
 - Updated `@gladysassistant/integration-sdk` to 0.16.0 (additive: music player, AI and TTS provider types) and refreshed dev dependencies and CI actions.
@@ -41,6 +43,7 @@
 - A failed re-login (network blip, one-session-per-account contention) no longer leaves the client without a user token: it kept the previous session so the next signed request crashed with `The "key" argument ... Received null`, which broke the widget "refresh picture" button and dropped alarms until a full re-login succeeded. Signing without a token now raises a clean auth error instead of a crypto crash.
 - Real-time push is far more stable: a transient event-log poll failure no longer triggers a full re-login, which used to open a new cloud session that evicted the integration's own MQTT push (the broker pins the client id to the account) and forced a fallback to 15 s polling. The listener now re-authenticates only when the push is also down and polls keep failing.
 
-[Unreleased]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/vincentBesseau/gladys-integration-meari/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/vincentBesseau/gladys-integration-meari/releases/tag/v1.0.0

@@ -1,6 +1,6 @@
 {
   "name": "gladys-integration-meari",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Gladys Assistant external integration for Meari cloud cameras and doorbells (ieGeek Cam, CloudEdge, CloudPlus, ANRAN, Arenti, BoifunCam).",
   "type": "module",
